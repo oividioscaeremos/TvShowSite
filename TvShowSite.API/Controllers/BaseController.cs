@@ -1,16 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using TvShowSite.Core.Helpers;
 
 namespace TvShowSite.API.Controllers
 {
     public class BaseController : ControllerBase
     {
-		protected readonly ILogger _logger;
-		public BaseController(ILogger logger)
+		private string? _actionName
 		{
-			_logger = logger;
+			get
+			{
+				return this.ControllerContext.RouteData.Values["action"]?.ToString();
+            }
+		}
+        private string? _controllerName
+        {
+            get
+            {
+                return this.ControllerContext.RouteData.Values["controller"]?.ToString();
+            }
+        }
+
+        protected readonly LogHelper _logHelper;
+		public BaseController(LogHelper logHelper)
+		{
+			_logHelper = logHelper;
 		}
 
-        public async Task<ActionResult> ExecuteAsync(Func<Task<ActionResult>> function)
+        public async Task<ActionResult> ExecuteAsync(Func<Task<ActionResult>> function, object request)
         {
 			try
 			{
@@ -20,8 +37,26 @@ namespace TvShowSite.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex.Message, new { StackTrace = ex.StackTrace });
-			}
+				_logHelper.LogException("ExecuteAsync Exception", "API", _controllerName, _actionName, ex);
+
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+		public ActionResult Execute(Func<ActionResult> function, object request)
+		{
+			try
+			{
+                var result = function();
+
+				return result;
+            }
+            catch (Exception ex)
+			{
+                _logHelper.LogException("Execute Exception", "API", _controllerName, _actionName, ex);
+
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

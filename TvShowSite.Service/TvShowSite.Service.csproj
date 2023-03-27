@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SimpleInjector" Version="5.4.1" />
+    <PackageReference Include="SimpleInjector.Packaging" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TvShowSite.Core\TvShowSite.Core.csproj" />
+    <ProjectReference Include="..\TvShowSite.Data\TvShowSite.Data.csproj" />
+    <ProjectReference Include="..\TvShowSite.Domain\TvShowSite.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
