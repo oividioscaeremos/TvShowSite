@@ -1,7 +1,9 @@
-﻿using TvShowSite.Domain.Common;
+﻿using TvShowSite.Domain.Attributes;
+using TvShowSite.Domain.Common;
 
 namespace TvShowSite.Domain.TableEntities.BagEntities
 {
+    [TableName("CharacterEpisode")]
     public sealed class CharacterEpisode : CommonEntity
     {
         public int CharacterId { get; set; }

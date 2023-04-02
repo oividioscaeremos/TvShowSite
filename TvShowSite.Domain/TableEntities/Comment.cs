@@ -1,7 +1,9 @@
-﻿using TvShowSite.Domain.Common;
+﻿using TvShowSite.Domain.Attributes;
+using TvShowSite.Domain.Common;
 
 namespace TvShowSite.Domain.TableEntities
 {
+    [TableName("Comment")]
     public sealed class Comment : BaseEntity
     {
         public int? ParentCommentId { get; set; }
