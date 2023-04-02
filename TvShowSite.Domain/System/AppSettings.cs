@@ -13,6 +13,6 @@ namespace TvShowSite.Domain.System
 
     public class ConnectionStrings
     {
-        public string? PostgreSql { get; set; }
+        public string? SiteDbConnectionString { get; set; }
     }
 }

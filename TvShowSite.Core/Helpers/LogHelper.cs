@@ -8,7 +8,10 @@ namespace TvShowSite.Core.Helpers
 {
     public class LogHelper
     {
-        public LogHelper() { }
+        public LogHelper()
+        {
+            
+        }
 
         public void LogException(
             string description, 

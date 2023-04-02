@@ -22,18 +22,22 @@ namespace TvShowSite.API.Controllers
         }
 
         protected readonly LogHelper _logHelper;
-		public BaseController(LogHelper logHelper)
+        protected readonly IHttpContextAccessor _httpContextAccessor;
+        public BaseController(
+            LogHelper logHelper,
+            IHttpContextAccessor httpContextAccessor)
 		{
 			_logHelper = logHelper;
-		}
+            _httpContextAccessor = httpContextAccessor;
+        }
 
-        public async Task<ActionResult> ExecuteAsync(Func<Task<ActionResult>> function, object request)
+        public async Task<ActionResult> ExecuteAsync<T>(Func<Task<T>> function, object? request = null)
         {
 			try
 			{
 				var result = await function();
 
-				return result;
+				return Ok(result);
 			}
 			catch (Exception ex)
 			{
@@ -43,13 +47,13 @@ namespace TvShowSite.API.Controllers
             }
         }
 
-		public ActionResult Execute(Func<ActionResult> function, object request)
+		public ActionResult Execute<T>(Func<T> function, object? request = null)
 		{
 			try
 			{
                 var result = function();
 
-				return result;
+				return Ok(result);
             }
             catch (Exception ex)
 			{

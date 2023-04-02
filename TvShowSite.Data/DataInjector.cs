@@ -1,5 +1,7 @@
 ﻿using SimpleInjector;
 using SimpleInjector.Packaging;
+using TvShowSite.Data.Common.Connections;
+using TvShowSite.Data.Repositories;
 
 namespace TvShowSite.Data
 {
@@ -7,7 +9,9 @@ namespace TvShowSite.Data
     {
         public void RegisterServices(Container container)
         {
+            container.Register<SiteDbConnection>(Lifestyle.Singleton);
 
+            container.Register<UserTableRepository>(Lifestyle.Singleton);
         }
     }
 }

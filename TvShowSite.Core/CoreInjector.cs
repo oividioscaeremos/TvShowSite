@@ -8,7 +8,7 @@ namespace TvShowSite.Core
     {
         public void RegisterServices(Container container)
         {
-            container.Register<LogHelper>(Lifestyle.Scoped);
+            container.Register<LogHelper>(Lifestyle.Singleton);
         }
     }
 }
