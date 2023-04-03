@@ -10,11 +10,6 @@ namespace TvShowSite.Data.Common.Connections
 {
     public class SiteDbConnection : ICustomDbConnection
     {
-        private readonly IOptions<UserSecrets> _userSecrets;
-        public SiteDbConnection(IOptions<UserSecrets> userSecrets)
-        {
-            _userSecrets = userSecrets;
-        }
         public IDbConnection Connection
         {
             get
