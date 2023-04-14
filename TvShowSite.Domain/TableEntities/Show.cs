@@ -18,5 +18,6 @@ namespace TvShowSite.Domain.TableEntities
         public bool IsOngoing { get; set; }
         public int ProductionCompanyId { get; set; }
         public int EpisodeRunTime { get; set; }
+        public int? Popularity { get; set; }
     }
 }
