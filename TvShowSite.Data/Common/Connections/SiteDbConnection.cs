@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using Npgsql;
+﻿using Npgsql;
 using System.Data;
-using System.Data.SqlClient;
 using TvShowSite.Core.Abstractions.DataAbstractions.Common;
 using TvShowSite.Core.Helpers;
-using TvShowSite.Domain.System;
 
 namespace TvShowSite.Data.Common.Connections
 {
