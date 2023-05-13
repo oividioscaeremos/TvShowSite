@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TvShowSite.Data.Repositories;
-using TvShowSite.Domain.Entities;
+using TvShowSite.Domain.Entities.ShowEntities;
 using TvShowSite.Service.Common;
 
 namespace TvShowSite.Service.Services
@@ -60,6 +60,22 @@ namespace TvShowSite.Service.Services
                 {
                     response.ErrorList.Add($"Could not find any shows with the name '{request.Name}'");
                 }
+            }
+
+            return response;
+        }
+
+        public async Task<ShowDescriptionSearchResponse> GetShowDescriptionAsync(ShowDescriptionSearchRequest request)
+        {
+            var response = new ShowDescriptionSearchResponse();
+
+            if(request?.Id is not null)
+            {
+                response.Value = await _showRepository.GetShowDescriptionAsync(request.Id.Value);
+            }
+            else
+            {
+                response.ErrorList.Add("Cannot find show description without identification number.");
             }
 
             return response;

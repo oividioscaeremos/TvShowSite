@@ -1,6 +1,6 @@
 ﻿using TvShowSite.Domain.Common;
 
-namespace TvShowSite.Domain.Entities
+namespace TvShowSite.Domain.Entities.ShowEntities
 {
     public class ShowSearchRequest
     {
@@ -25,7 +25,7 @@ namespace TvShowSite.Domain.Entities
 
         public ShowSearchResponse()
         {
-            this.Value = new List<ShowSearchResponseEntity>();
+            Value = new List<ShowSearchResponseEntity>();
         }
     }
 }

@@ -42,5 +42,16 @@ namespace TvShowSite.Data.Repositories
                 { "MovieDbId", movieDbId }
             });
         }
+
+        public async Task<string?> GetShowDescriptionAsync(int id)
+        {
+            return await QueryFirstOrDefaultAsync<string?>(@"
+                SELECT Description FROM site.Show
+                WHERE Id = @Id
+            ", new Dictionary<string, object>()
+            {
+                { "Id", id }
+            });
+        }
     }
 }
