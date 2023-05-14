@@ -18,6 +18,19 @@ namespace TvShowSite.Domain.Common
         public int? UpdatedBy { get; set; }
     }
 
+    public class BaseResponse
+    {
+        public List<string> ErrorList { get; set; }
+        public List<string> WarningList { get; set; }
+        public bool Status => this.ErrorList.Any() == false;
+
+        public BaseResponse()
+        {
+            this.ErrorList = new List<string>();
+            this.WarningList = new List<string>();
+        }
+    }
+
     public class BaseResponse<T> where T : class
     {
         public T? Value { get; set; }

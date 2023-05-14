@@ -10,6 +10,7 @@ namespace TvShowSite.Core
         {
             container.Register<LogHelper>(Lifestyle.Singleton);
             container.Register<HttpHelper>(Lifestyle.Singleton);
+            container.Register<SecurityHelper>(Lifestyle.Singleton);
         }
     }
 }

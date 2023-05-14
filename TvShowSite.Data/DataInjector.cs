@@ -23,7 +23,6 @@ namespace TvShowSite.Data
             container.Register<EmojiRepository>(Lifestyle.Singleton);
             container.Register<CountryRepository>(Lifestyle.Singleton);
             container.Register<CommentRepository>(Lifestyle.Singleton);
-
             container.Register<UserShowRepository>(Lifestyle.Singleton);
             container.Register<UserEpisodeRepository>(Lifestyle.Singleton);
             container.Register<ShowLanguageRepository>(Lifestyle.Singleton);
@@ -32,6 +31,7 @@ namespace TvShowSite.Data
             container.Register<EpisodeEmojiRepository>(Lifestyle.Singleton);
             container.Register<CommentEmojiRepository>(Lifestyle.Singleton);
             container.Register<CharacterEpisodeRepository>(Lifestyle.Singleton);
+            container.Register<AuthorizationRepository>(Lifestyle.Singleton);
         }
     }
 }

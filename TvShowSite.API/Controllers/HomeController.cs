@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TvShowSite.Core.Helpers;
 using TvShowSite.Data.Repositories;
 
 namespace TvShowSite.API.Controllers
 {
-    [Route("api/home")]
+    [Route("home")]
+    [Authorize]
     public class HomeController : BaseController
     {
         private readonly UserTableRepository _userTableRepository;

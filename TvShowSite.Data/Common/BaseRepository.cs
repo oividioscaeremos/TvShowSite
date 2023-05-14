@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using TvShowSite.Core.Abstractions.DataAbstractions.Common;
 using TvShowSite.Core.ExtensionMethods;
 using TvShowSite.Domain.Attributes;
@@ -88,7 +89,7 @@ namespace TvShowSite.Data.Common
             }
         }
 
-        protected async Task<IEnumerable<T>> QueryAsync(string query, Dictionary<string, object> dict)
+        public async Task<IEnumerable<T>> QueryAsync(string query, Dictionary<string, object> dict)
         {
             using (var connection = _connection.Connection)
             {
@@ -96,7 +97,7 @@ namespace TvShowSite.Data.Common
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> QueryAsync<TEntity>(string query, Dictionary<string, object> dict)
+        public async Task<IEnumerable<TEntity>> QueryAsync<TEntity>(string query, Dictionary<string, object> dict)
         {
             using (var connection = _connection.Connection)
             {
@@ -104,7 +105,7 @@ namespace TvShowSite.Data.Common
             }
         }
 
-        protected async Task<T> QueryFirstOrDefaultAsync(string query, Dictionary<string, object> dict)
+        public async Task<T> QueryFirstOrDefaultAsync(string query, Dictionary<string, object> dict)
         {
             using (var connection = _connection.Connection)
             {
@@ -112,7 +113,7 @@ namespace TvShowSite.Data.Common
             }
         }
 
-        protected async Task<TEntity> QueryFirstOrDefaultAsync<TEntity>(string query, Dictionary<string, object> dict)
+        public async Task<TEntity> QueryFirstOrDefaultAsync<TEntity>(string query, Dictionary<string, object> dict)
         {
             using (var connection = _connection.Connection)
             {
@@ -120,13 +121,36 @@ namespace TvShowSite.Data.Common
             }
         }
 
-        protected async Task InsertAsync(T entity)
+        public async Task InsertAsync(T entity, int userId)
         {
+            entity.InsertDate = DateTime.Now;
+            entity.InsertedBy = userId;
+
             var generatedValues = GenerateInsertSQL(entity);
 
             using (var connection = _connection.Connection)
             {
-                await connection.QueryFirstOrDefaultAsync<T>(generatedValues.query, generatedValues.dict);
+                var id = await connection.QueryFirstOrDefaultAsync<int>(generatedValues.query, generatedValues.dict);
+
+                entity.Id = id;
+            }
+        }
+
+        public async Task MarkAsDeletedAsync(T entity, int userId)
+        {
+            using (var connection = _connection.Connection)
+            {
+                await connection.ExecuteAsync($@"
+                    UPDATE {SchemaName}.{TableName}
+                    SET IsDeleted = true,
+                    UpdateDate = NOW(),
+                    UpdatedBy = @UserId
+                    WHERE Id = @Id
+                ", new Dictionary<string, object>
+                {
+                    { "UserId", userId },
+                    { "Id", entity.Id }
+                });
             }
         }
 
@@ -146,7 +170,7 @@ namespace TvShowSite.Data.Common
                 {
                     var propValue = prop.GetValue(entity);
 
-                    if(propValue is not null && !propValue.IsNullOrDefault())
+                    if(propValue is not null)
                     {
                         columnNames.Add(prop.Name);
 
@@ -158,6 +182,7 @@ namespace TvShowSite.Data.Common
             string sql = $@"
                 INSERT INTO {SchemaName}.{TableName} ({string.Join(",", columnNames)})
                 VALUES ({string.Join(",", dict.Keys.Select(k => "@" + k))})
+                RETURNING id
             ";
 
             return (sql, dict);
