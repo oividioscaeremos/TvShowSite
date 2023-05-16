@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 using TvShowSite.Core.Helpers;
 
 namespace TvShowSite.API.Controllers
@@ -18,6 +19,51 @@ namespace TvShowSite.API.Controllers
             get
             {
                 return this.ControllerContext.RouteData.Values["controller"]?.ToString();
+            }
+        }
+
+        protected int? UserId
+        {
+            get
+            {
+                var claimsIdentity = _httpContextAccessor.HttpContext?.User.Identity as ClaimsIdentity;
+
+                if(claimsIdentity is not null)
+                {
+                    var userIdClaim = claimsIdentity.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+                    if(userIdClaim is not null)
+                    {
+                        return int.Parse(userIdClaim);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        protected string? Username
+        {
+            get
+            {
+                var claimsIdentity = _httpContextAccessor.HttpContext?.User.Identity as ClaimsIdentity;
+
+                if (claimsIdentity is not null)
+                {
+                    var usernameClaim = claimsIdentity.Claims.FirstOrDefault(c => c.Type == "Username")?.Value;
+
+                    return usernameClaim;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 

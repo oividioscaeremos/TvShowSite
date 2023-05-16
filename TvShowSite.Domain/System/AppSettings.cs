@@ -2,8 +2,15 @@
 {
     public class Settings
     {
+        public AppSettings? AppSettings { get; set; }
         public ConnectionStrings? ConnectionStrings { get; set; }
         public ApiDetails? ApiDetails { get; set; }
+    }
+
+    public class AppSettings
+    {
+        public int AccessTokenLifetimeInMinutes { get; set; }
+        public int RefreshTokenLifetimeInMinutes { get; set; }
     }
 
     public class ConnectionStrings

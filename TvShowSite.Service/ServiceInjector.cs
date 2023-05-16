@@ -1,5 +1,7 @@
 ﻿using SimpleInjector;
 using SimpleInjector.Packaging;
+using TvShowSite.Service.Common;
+using TvShowSite.Service.Services;
 
 namespace TvShowSite.Service
 {
@@ -7,7 +9,9 @@ namespace TvShowSite.Service
     {
         public void RegisterServices(Container container)
         {
-
+            container.Register<AccountService>(Lifestyle.Singleton);
+            container.Register<ShowService>(Lifestyle.Singleton);
+            container.Register<MovieDbService>(Lifestyle.Singleton);
         }
     }
 }
