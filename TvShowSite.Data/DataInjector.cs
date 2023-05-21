@@ -16,7 +16,6 @@ namespace TvShowSite.Data
             container.Register<ShowRepository>(Lifestyle.Singleton);
             container.Register<SeasonRepository>(Lifestyle.Singleton);
             container.Register<ProductionCompanyRepository>(Lifestyle.Singleton);
-            container.Register<PersonRepository>(Lifestyle.Singleton);
             container.Register<LanguageRepository>(Lifestyle.Singleton);
             container.Register<GenreRepository>(Lifestyle.Singleton);
             container.Register<EpisodeRepository>(Lifestyle.Singleton);
@@ -32,6 +31,7 @@ namespace TvShowSite.Data
             container.Register<CommentEmojiRepository>(Lifestyle.Singleton);
             container.Register<CharacterEpisodeRepository>(Lifestyle.Singleton);
             container.Register<AuthorizationRepository>(Lifestyle.Singleton);
+            container.Register<CharacterRepository>(Lifestyle.Singleton);
         }
     }
 }

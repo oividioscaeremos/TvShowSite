@@ -12,6 +12,8 @@ namespace TvShowSite.Service
             container.Register<AccountService>(Lifestyle.Singleton);
             container.Register<ShowService>(Lifestyle.Singleton);
             container.Register<MovieDbService>(Lifestyle.Singleton);
+            container.Register<HomeService>(Lifestyle.Singleton);
+            container.Register<EpisodeService>(Lifestyle.Singleton);
         }
     }
 }

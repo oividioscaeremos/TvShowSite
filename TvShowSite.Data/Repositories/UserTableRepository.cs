@@ -50,5 +50,20 @@ namespace TvShowSite.Data.Repositories
                 { "Password", password }
             });
         }
+
+        public async Task MarkAsDeletedByUserIdAsync(int userId)
+        {
+            await QueryAsync(@"
+                UPDATE site.UserTable
+                SET IsDeleted = TRUE,
+                UpdateDate = NOW(),
+                UpdatedBy = @UserId
+                WHERE InsertedBy = @UserId
+                AND IsDeleted = FALSE
+            ", new Dictionary<string, object>()
+            {
+                { "UserId", userId }
+            });
+        }
     }
 }

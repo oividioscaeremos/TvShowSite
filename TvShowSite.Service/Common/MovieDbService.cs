@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using TvShowSite.Core.Helpers;
 using TvShowSite.Domain.ApiEntities;
+using TvShowSite.Domain.ApiEntities.MovieDbOrg;
 using TvShowSite.Domain.Entities;
 
 namespace TvShowSite.Service.Common
@@ -30,40 +32,109 @@ namespace TvShowSite.Service.Common
                 { "page", page.ToString() }
             };
 
-            var requestString = PrepareUrl(parameters);
+            var requestString = PrepareUrl("/search/tv", parameters, null);
 
             var response = await GetResultsFromAPIAsync<MovieDbShowSearchResponse>(requestString);
 
             return response;
         }
 
-        private static string PrepareUrl(Dictionary<string, string> parameters)
+        public async Task<ShowDetail?> GetShowDetailsAsync(int movieDbId)
         {
-            if(parameters is not null)
+            var parameters = new Dictionary<string, string>
             {
-                var sb = new StringBuilder(SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.BaseUrl);
+                { "tv", movieDbId.ToString() }
+            };
 
-                for(int i = 0; i < parameters.Count; i++)
+            var requestString = PrepareUrl(null, null, parameters);
+
+            var response = await GetResultsFromAPIAsync<ShowDetail>(requestString);
+
+            return response;
+        }
+
+        public async Task<SeasonDetail?> GetSeasonDetailsAsync(int tvShowMovieDbId, int seasonNumber)
+        {
+            var parameters = new Dictionary<string, string>
+            {
+                { "tv", tvShowMovieDbId.ToString() },
+                { "season", seasonNumber.ToString() }
+            };
+
+            var requestString = PrepareUrl(null, null, parameters);
+
+            var response = await GetResultsFromAPIAsync<SeasonDetail>(requestString);
+
+            return response;
+        }
+
+        public async Task<EpisodeDetail?> GetEpisodeDetailsAsync(int tvShowMovieDbId, int seasonNumber, int episodeNumber)
+        {
+            var parameters = new Dictionary<string, string>
+            {
+                { "tv", tvShowMovieDbId.ToString() },
+                { "season", seasonNumber.ToString() },
+                { "episode", episodeNumber.ToString() },
+            };
+
+            var requestString = PrepareUrl(null, null, parameters);
+
+            var response = await GetResultsFromAPIAsync<EpisodeDetail>(requestString);
+
+            return response;
+        }
+
+        public async Task<CreditDetail?> GetCreditDetailsAsync(int tvShowMovieDbId, int seasonNumber, int episodeNumber)
+        {
+            var parameters = new Dictionary<string, string>
+            {
+                { "tv", tvShowMovieDbId.ToString() },
+                { "season", seasonNumber.ToString() },
+                { "episode", episodeNumber.ToString() },
+                { "credits", string.Empty }
+            };
+
+            var requestString = PrepareUrl(null, null, parameters).TrimEnd('/');
+
+            var response = await GetResultsFromAPIAsync<CreditDetail>(requestString);
+
+            return response;
+        }
+
+        private static string PrepareUrl(string? basePath, Dictionary<string, string>? queryParameters, Dictionary<string, string>? pathParameters)
+        {
+            var sb = new StringBuilder(SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.BaseUrl);
+
+            if (!string.IsNullOrEmpty(basePath))
+            {
+                sb.Append(basePath);
+            }
+
+            if (pathParameters?.Any() == true)
+            {
+                foreach(var keyValuePair in pathParameters)
                 {
-                    sb.Append((i == 0 ? "?" : "&") + parameters.ElementAt(i).Key + "=" + parameters.ElementAt(i).Value);
+                    sb.Append($"/{keyValuePair.Key}/{keyValuePair.Value}");
                 }
+            }
 
-                return sb.ToString();
-            }
-            else
+            if(queryParameters?.Any() == true)
             {
-                return SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.BaseUrl ?? string.Empty;
+                for(int i = 0; i < queryParameters.Count; i++)
+                {
+                    sb.Append((i == 0 ? "?" : "&") + queryParameters.ElementAt(i).Key + "=" + queryParameters.ElementAt(i).Value);
+                }
             }
+
+            return sb.ToString();
         }
 
         private async Task<T?> GetResultsFromAPIAsync<T>(string url)
         {
-            if(string.IsNullOrEmpty(url))
+            if(!string.IsNullOrEmpty(url))
             {
                 var headers = new Dictionary<string, string>()
                 {
-                    { "Content-Type", "application/json" },
-                    { "Accept", "application/json" },
                     { "Authorization", "Bearer " + SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.AccessToken },
                 };
 

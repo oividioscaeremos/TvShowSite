@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http.Features;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TvShowSite.Domain.ApiEntities.MovieDbOrg;
 using TvShowSite.Domain.Entities.AccountEntities;
 
 namespace TvShowSite.Service.ValidationServices
@@ -17,20 +19,20 @@ namespace TvShowSite.Service.ValidationServices
             {
                 if (string.IsNullOrEmpty(request.Username))
                 {
-                    response.Add("Kullanıcı adı boş olamaz.");
+                    response.Add("Username cannot be empty.");
                 }
                 if (string.IsNullOrEmpty(request.Password))
                 {
-                    response.Add("Şifre boş olamaz.");
+                    response.Add("Password cannot be empty.");
                 }
                 if (string.IsNullOrEmpty(request.EmailAddress))
                 {
-                    response.Add("Mail adresi boş olamaz.");
+                    response.Add("Mail address cannot be empty.");
                 }
             }
             else
             {
-                response.Add("Talep boş olamaz.");
+                response.Add("Request cannot be empty.");
             }    
 
             return response;
@@ -44,16 +46,16 @@ namespace TvShowSite.Service.ValidationServices
             {
                 if (string.IsNullOrEmpty(request.Username))
                 {
-                    response.Add("Kullanıcı adı boş olamaz.");
+                    response.Add("Username cannot be empty.");
                 }
                 if (string.IsNullOrEmpty(request.Password))
                 {
-                    response.Add("Şifre boş olamaz.");
+                    response.Add("Password cannot be empty.");
                 }
             }
             else
             {
-                response.Add("Talep boş olamaz.");
+                response.Add("Request cannot be empty.");
             }
 
             return response;
@@ -67,12 +69,12 @@ namespace TvShowSite.Service.ValidationServices
             {
                 if (string.IsNullOrEmpty(request.RefreshToken))
                 {
-                    response.Add("RefreshToken boş olamaz.");
+                    response.Add("RefreshToken cannot be empty.");
                 }
             }
             else
             {
-                response.Add("Talep boş olamaz.");
+                response.Add("Request cannot be empty.");
             }
 
             return response;

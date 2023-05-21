@@ -11,5 +11,16 @@ namespace TvShowSite.Data.Repositories
 
         }
 
+        public async Task<Language> GetByNameAsync(string name)
+        {
+            return await QueryFirstOrDefaultAsync(@"
+                SELECT * FROM site.Language
+                WHERE Name = @Name
+                LIMIT 1
+            ", new Dictionary<string, object>()
+            {
+                { "Name", name }
+            });
+        }
     }
 }

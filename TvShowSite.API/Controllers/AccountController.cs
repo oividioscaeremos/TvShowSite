@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Web.Http.Controllers;
 using TvShowSite.Core.Helpers;
 using TvShowSite.Domain.Entities.AccountEntities;
 using TvShowSite.Service.Services;
@@ -40,6 +41,17 @@ namespace TvShowSite.API.Controllers
             return await ExecuteAsync(async () =>
             {
                 return await _accountService.LoginAsync(request);
+            });
+        }
+
+        [Authorize(AuthenticationSchemes = "Timeless")]
+        [Route("logout")]
+        [HttpDelete]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _accountService.LogoutAsync(UserId);
             });
         }
         

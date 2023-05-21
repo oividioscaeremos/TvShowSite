@@ -11,5 +11,21 @@ namespace TvShowSite.Data.Repositories.BagRepositories
 
         }
 
+        public async Task<CharacterEpisode> GetByCharacterIdSeasonIdEpisodeIdAsync(int characterId, int seasonId, int episodeId)
+        {
+            return await QueryFirstOrDefaultAsync(@"
+                SELECT * FROM site.CharacterEpisode
+                WHERE CharacterId = @CharacterId
+                AND SeasonId = @SeasonId
+                AND EpisodeId = @EpisodeId
+                AND IsDeleted <> TRUE
+                LIMIT 1
+            ", new Dictionary<string, object>()
+            {
+                { "CharacterId", characterId },
+                { "SeasonId", seasonId },
+                { "EpisodeId", episodeId },
+            });
+        }
     }
 }

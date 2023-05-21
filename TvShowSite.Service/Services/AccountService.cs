@@ -177,6 +177,13 @@ namespace TvShowSite.Service.Services
             return response;
         }
 
+        public async Task<string> LogoutAsync(int userId)
+        {
+            await _userTableRepository.MarkAsDeletedByUserIdAsync(userId);
+
+            return "Success";
+        }
+
         private static (string? accessToken, string? refreshToken) CreateAccessTokenAndRefreshToken(int userId, string username, DateTime expiresAt)
         {
             var claims = new Dictionary<string, object>

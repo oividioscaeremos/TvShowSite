@@ -11,5 +11,17 @@ namespace TvShowSite.Data.Repositories
 
         }
 
+        public async Task<Episode> GetByMovieDbIdAsync(string movieDbId)
+        {
+            return await QueryFirstOrDefaultAsync(@"
+                SELECT * FROM site.Episode
+                WHERE MovieDbId = @MovieDbId
+                AND IsDeleted <> TRUE
+                LIMIT 1
+            ", new Dictionary<string, object>()
+            {
+                { "MovieDbId", movieDbId }
+            });
+        }
     }
 }

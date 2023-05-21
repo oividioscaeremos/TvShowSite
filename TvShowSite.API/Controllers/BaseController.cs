@@ -22,7 +22,7 @@ namespace TvShowSite.API.Controllers
             }
         }
 
-        protected int? UserId
+        protected int UserId
         {
             get
             {
@@ -38,12 +38,12 @@ namespace TvShowSite.API.Controllers
                     }
                     else
                     {
-                        return null;
+                        throw new ArgumentNullException("UserId");
                     }
                 }
                 else
                 {
-                    return null;
+                    throw new ArgumentNullException("UserId");
                 }
             }
         }

@@ -12,10 +12,12 @@ namespace TvShowSite.Domain.Entities.ShowEntities
     public class ShowSearchResponseEntity
     {
         public int? Id { get; set; }
+        public int? MovieDbId { get; set; }
         public string? ShowName { get; set; }
         public string? PosterURL { get; set; }
         public int? EpisodeCount { get; set; }
         public int? SeasonCount { get; set; }
+        public bool IsAdded { get; set; }
     }
 
     public class ShowSearchResponse : BaseResponse<List<ShowSearchResponseEntity>>

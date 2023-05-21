@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,36 +12,38 @@ namespace TvShowSite.Domain.ApiEntities
     {
         public string Language { get; set; } = "en-US";
         public string? Query { get; set; }
-        [JsonPropertyName("include_adult")]
+        [JsonProperty("include_adult")]
         public bool IncludeAdult { get; set; }
         public int Page { get; set; } = 1;
     }
 
     public class MovieDbShowResponseEntity
     {
-        [JsonPropertyName("poster_path")]
+        [JsonProperty("poster_path")]
         public string? PosterPath { get; set; }
-        public int? Popularity { get; set; }
+        public double? Popularity { get; set; }
         public int? Id { get; set; }
-        [JsonPropertyName("backdrop_path")]
+        [JsonProperty("backdrop_path")]
         public string? BackdropPath { get; set; }
-        [JsonPropertyName("vote_average")]
-        public int? VoteAverage { get; set; }
+        [JsonProperty("vote_average")]
+        public double? VoteAverage { get; set; }
         public string? Overview { get; set; }
-        [JsonPropertyName("vote_count")]
+        [JsonProperty("vote_count")]
         public int? VoteCount { get; set; }
         public string? Name { get; set; }
-        [JsonPropertyName("original_name")]
+        [JsonProperty("original_name")]
         public string? OriginalName { get; set; }
+        [JsonProperty("origin_country")]
+        public List<string>? OriginCountry { get; set; }
     }
 
     public class MovieDbShowSearchResponse
     {
         public int? Page { get; set; }
         public List<MovieDbShowResponseEntity> Results { get; set; }
-        [JsonPropertyName("total_results")]
+        [JsonProperty("total_results")]
         public int? TotalResults { get; set; }
-        [JsonPropertyName("total_pages")]
+        [JsonProperty("total_pages")]
         public int? TotalPages { get; set; }
 
         public MovieDbShowSearchResponse()

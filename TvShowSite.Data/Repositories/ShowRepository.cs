@@ -1,5 +1,6 @@
 ﻿using TvShowSite.Data.Common;
 using TvShowSite.Data.Common.Connections;
+using TvShowSite.Domain.Entities.ShowEntities;
 using TvShowSite.Domain.TableEntities;
 
 namespace TvShowSite.Data.Repositories
@@ -39,7 +40,7 @@ namespace TvShowSite.Data.Repositories
                 WHERE MovieDbId = @MovieDbId
             ", new Dictionary<string, object>()
             {
-                { "MovieDbId", movieDbId }
+                { "MovieDbId", movieDbId.ToString() }
             });
         }
 
@@ -52,6 +53,14 @@ namespace TvShowSite.Data.Repositories
             {
                 { "Id", id }
             });
+        }
+
+        public async Task<IEnumerable<ShowMovieDbIdModel>> GetAllShowIdMovieDbIdAsync()
+        {
+            return await QueryAsync<ShowMovieDbIdModel>(@"
+                SELECT Id, MovieDbId FROM site.Show
+                WHERE IsDeleted <> TRUE
+            ", new Dictionary<string, object>() { });
         }
     }
 }
