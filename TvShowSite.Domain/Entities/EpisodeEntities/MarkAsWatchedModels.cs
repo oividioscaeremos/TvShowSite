@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TvShowSite.Domain.Common;
 
-namespace TvShowSite.Domain.Entities.ShowEntities
+namespace TvShowSite.Domain.Entities.EpisodeEntities
 {
     public class MarkAsWatchedRequest
     {

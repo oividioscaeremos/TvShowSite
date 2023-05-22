@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TvShowSite.Domain.Entities.EpisodeEntities;
 using TvShowSite.Domain.Entities.ShowEntities;
 
 namespace TvShowSite.Service.ValidationServices

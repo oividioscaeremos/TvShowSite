@@ -13,9 +13,9 @@ namespace TvShowSite.Data.Repositories.BagRepositories
 
         }
 
-        public async Task<IEnumerable<UserShowHomeEntity>> GetUserNextToWatchAsync(int userId)
+        public async Task<IEnumerable<UserShowHomeEntity>> GetUserNextToWatchAsync(int userId, int? showId = null)
         {
-            return await QueryAsync<UserShowHomeEntity>(@"
+            return await QueryAsync<UserShowHomeEntity>($@"
                 SELECT 
                     E.ShowId,
                     MIN(E.Id) as EpisodeId,
@@ -38,11 +38,13 @@ namespace TvShowSite.Data.Repositories.BagRepositories
                     SELECT UEE.EpisodeId FROM site.UserEpisode UEE
                     WHERE UEE.UserId = @UserId
                 )
+                {(showId.HasValue ? "AND E.ShowId = @ShowId" : "")}
                 GROUP BY E.ShowId
             ", new Dictionary<string, object>()
             {
                 { "UserId", userId },
-                { "PosterBase", SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.ImageBaseUrl }
+                { "PosterBase", SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.ImageBaseUrl ?? "" },
+                { "ShowId", showId ?? -1 }
             });
         }
 

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TvShowSite.Core.Helpers;
-using TvShowSite.Domain.Entities.ShowEntities;
+using TvShowSite.Domain.Entities.EpisodeEntities;
 using TvShowSite.Service.Services;
 
 namespace TvShowSite.API.Controllers
@@ -28,6 +28,16 @@ namespace TvShowSite.API.Controllers
             return await ExecuteAsync(async () =>
             {
                 return await _episodeService.MarkAsWatchedAsync(request, UserId);
+            });
+        }
+        
+        [HttpGet]
+        [Route("get_show_next_to_watch")]
+        public async Task<IActionResult> GetShowNextToWatchEpisodeAsync(int? showId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.GetShowNextToWatchEpisodeAsync(UserId, showId);
             });
         }
     }

@@ -50,11 +50,53 @@ namespace TvShowSite.API.Controllers
             });
         }
 
-        public async Task<ActionResult> GetShowDescriptionAsync([FromBody]ShowDescriptionSearchRequest request)
+        [HttpGet]
+        [Route("get_description")]
+        public async Task<ActionResult> GetShowDescriptionAsync(int? showId)
         {
             return await ExecuteAsync(async () =>
             {
-                return await _showService.GetShowDescriptionAsync(request);
+                return await _showService.GetShowDescriptionAsync(showId);
+            });
+        }
+        
+        [HttpGet]
+        [Route("get_name")]
+        public async Task<ActionResult> GetShowNameAsync(int? showId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _showService.GetShowNameAsync(showId);
+            });
+        }
+        
+        [HttpGet]
+        [Route("get_poster")]
+        public async Task<ActionResult> GetShowPosterURLAsync(int? showId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _showService.GetShowPosterURLAsync(showId);
+            });
+        }
+
+        [HttpGet]
+        [Route("get_favorite_characters")]
+        public async Task<ActionResult> GetShowFavoriteCharactersAsync(int? showId, int? episodeId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _showService.GetShowFavoriteCharactersAsync(showId, episodeId);
+            });
+        }
+
+        [HttpGet]
+        [Route("get_seasons_episodes")]
+        public async Task<ActionResult> GetShowSeasonsEpisodesAsync(int? showId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _showService.GetShowSeasonsEpisodesAsync(showId);
             });
         }
     }

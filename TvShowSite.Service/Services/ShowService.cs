@@ -182,17 +182,83 @@ namespace TvShowSite.Service.Services
             return response;
         }
 
-        public async Task<ShowDescriptionSearchResponse> GetShowDescriptionAsync(ShowDescriptionSearchRequest request)
+        public async Task<ShowDescriptionSearchResponse> GetShowDescriptionAsync(int? id)
         {
             var response = new ShowDescriptionSearchResponse();
 
-            if(request?.Id is not null)
+            if (id.HasValue)
             {
-                response.Value = await _showRepository.GetShowDescriptionAsync(request.Id.Value);
+                response.Value = await _showRepository.GetShowDescriptionAsync(id.Value);
             }
             else
             {
                 response.ErrorList.Add("Cannot find show description without identification number.");
+            }
+
+            return response;
+        }
+
+        public async Task<ShowNameResponse> GetShowNameAsync(int? id)
+        {
+            var response = new ShowNameResponse();
+
+            if(id.HasValue)
+            {
+                response.Value = await _showRepository.GetShowNameAsync(id.Value);
+            }
+            else
+            {
+                response.ErrorList.Add("Cannot find show description without identification number.");
+            }
+
+            return response;
+        }
+
+        public async Task<GetPosterURLResponse> GetShowPosterURLAsync(int? id)
+        {
+            var response = new GetPosterURLResponse();
+
+            if (id.HasValue)
+            {
+                response.Value = await _showRepository.GetShowPosterURLAsync(id.Value);
+            }
+            else
+            {
+                response.ErrorList.Add("Cannot find show description without identification number.");
+            }
+
+            return response;
+        }
+
+        public async Task<FavoriteCharactersResponse> GetShowFavoriteCharactersAsync(int? id, int? episodeId)
+        {
+            var response = new FavoriteCharactersResponse()
+            {
+                Value = new List<FavoriteCharactersResponsEntity>()
+            };
+
+            if (!id.HasValue) response.ErrorList.Add("Show identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                response.Value = (await _characterEpisodeRepository.GetCharactersByShowIdAndEpisodeIdAsync(id!.Value, episodeId)).ToList();
+            }
+
+            return response;
+        }
+
+        public async Task<SeasonEpisodeResponse> GetShowSeasonsEpisodesAsync(int? showId)
+        {
+            var response = new SeasonEpisodeResponse()
+            {
+                Value = new List<SeasonEpisodeResponseEntity>()
+            };
+
+            if (!showId.HasValue) response.ErrorList.Add("Show identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                response.Value = (await _showRepository.GetShowSeasonsEpisodesByShowIdAsync(showId!.Value)).ToList();
             }
 
             return response;
