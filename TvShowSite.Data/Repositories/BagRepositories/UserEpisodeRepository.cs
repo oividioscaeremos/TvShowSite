@@ -20,6 +20,7 @@ namespace TvShowSite.Data.Repositories.BagRepositories
                     E.ShowId,
                     MIN(E.Id) as EpisodeId,
                     (SELECT SeasonNumber FROM site.Season WHERE Id = MIN(S.Id)),
+                    MIN(S.Id) as SeasonId,
                     (SELECT EpisodeNumber FROM site.Episode WHERE Id = MIN(E.Id)),
                     (SELECT CONCAT(@PosterBase, PosterURL) as PosterURL FROM site.Show WHERE Id = MIN(E.ShowId)),
                     (SELECT Name FROM site.Show WHERE Id = MIN(E.ShowId))
@@ -27,6 +28,7 @@ namespace TvShowSite.Data.Repositories.BagRepositories
                     site.Episode E
                     LEFT OUTER JOIN site.UserEpisode UE
                     ON UE.EpisodeId = E.Id
+                    AND UE.IsDeleted <> TRUE
                     JOIN site.Season S
                     ON E.SeasonId = S.Id
                 WHERE E.ShowId IN (
@@ -37,6 +39,7 @@ namespace TvShowSite.Data.Repositories.BagRepositories
                 AND E.Id NOT IN (
                     SELECT UEE.EpisodeId FROM site.UserEpisode UEE
                     WHERE UEE.UserId = @UserId
+                    AND IsDeleted <> TRUE
                 )
                 {(showId.HasValue ? "AND E.ShowId = @ShowId" : "")}
                 GROUP BY E.ShowId
@@ -64,6 +67,23 @@ namespace TvShowSite.Data.Repositories.BagRepositories
             ", new Dictionary<string, object>()
             {
                 { "UserId", userId }
+            });
+        }
+
+        public async Task MarkAsDeletedByUserIdAndEpisodeIdAsync(int episodeId, int userId)
+        {
+            await QueryAsync(@"
+                UPDATE site.UserEpisode
+                SET IsDeleted = TRUE,
+                UpdateDate = NOW(),
+                UpdatedBy = @UserId
+                WHERE UserId = @UserId
+                AND EpisodeId = @EpisodeId
+                AND IsDeleted <> TRUE
+            ", new Dictionary<string, object>()
+            {
+                { "UserId", userId },
+                { "EpisodeId", episodeId }
             });
         }
     }

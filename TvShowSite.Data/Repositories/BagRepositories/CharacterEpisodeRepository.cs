@@ -33,25 +33,28 @@ namespace TvShowSite.Data.Repositories.BagRepositories
         public async Task<IEnumerable<FavoriteCharactersResponsEntity>> GetCharactersByShowIdAndEpisodeIdAsync(int showId, int? episodeId)
         {
             return await QueryAsync<FavoriteCharactersResponsEntity>($@"
-                SELECT
-                    CONCAT(@PosterBaseUrl, C.PosterURL) as PosterURL,
-                    MAX(C.CharacterName) as CharacterName,
-                    (
-                        SELECT COUNT(*) 
-                        FROM site.UserCharacterVote UCV 
-                        WHERE UCV.CharacterId = C.Id 
-                        AND UCV.IsDeleted <> TRUE
-                    ) as VoteCount
-                FROM
-                    site.CharacterEpisode CE,
-                    site.Character C,
-                    site.Episode E
-                WHERE
-                    E.Id = CE.EpisodeId
-                    AND C.Id = CE.CharacterId
-                    AND E.ShowId = @ShowId
-                GROUP BY {(episodeId.HasValue ? "E.Id" : "E.ShowId")}, C.Id
-                ORDER BY MAX(C.CharacterOrder) ASC
+                SELECT * FROM (
+                    SELECT
+                        CONCAT(@PosterBaseUrl, C.PosterURL) as PosterURL,
+                        MAX(C.CharacterName) as CharacterName,
+                        (
+                            SELECT COUNT(*) 
+                            FROM site.UserCharacterVote UCV 
+                            WHERE UCV.CharacterId = C.Id 
+                            AND UCV.IsDeleted <> TRUE
+                        ) as VoteCount,
+                        MAX(C.CharacterOrder) as CharacterOrder
+                    FROM
+                        site.CharacterEpisode CE,
+                        site.Character C,
+                        site.Episode E
+                    WHERE
+                        E.Id = CE.EpisodeId
+                        AND C.Id = CE.CharacterId
+                        AND E.ShowId = @ShowId
+                    GROUP BY {(episodeId.HasValue ? "E.Id" : "E.ShowId")}, C.Id
+                ) X
+                ORDER BY X.VoteCount DESC, X.CharacterOrder ASC
             ", new Dictionary<string, object>()
             {
                 { "ShowId", showId },

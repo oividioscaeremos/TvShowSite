@@ -16,6 +16,7 @@ namespace TvShowSite.Domain.Entities.EpisodeEntities
     public class MarkAsWatchedResponseEntity
     {
         public int EpisodeId { get; set; }
+        public int SeasonId { get; set; }
         public int SeasonNumber { get; set; }
         public int EpisodeNumber { get; set; }
         public bool IsFinished { get; set; }

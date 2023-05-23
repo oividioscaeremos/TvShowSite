@@ -31,6 +31,16 @@ namespace TvShowSite.API.Controllers
             });
         }
         
+        [HttpPost]
+        [Route("mark_as_not_watched")]
+        public async Task<IActionResult> MarkAsNotWatchedAsync([FromBody] MarkAsNotWatchedRequest request)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.MarkAsNotWatchedAsync(request, UserId);
+            });
+        }
+        
         [HttpGet]
         [Route("get_show_next_to_watch")]
         public async Task<IActionResult> GetShowNextToWatchEpisodeAsync(int? showId)
@@ -38,6 +48,16 @@ namespace TvShowSite.API.Controllers
             return await ExecuteAsync(async () =>
             {
                 return await _episodeService.GetShowNextToWatchEpisodeAsync(UserId, showId);
+            });
+        }
+
+        [HttpGet]
+        [Route("add_vote")]
+        public async Task<IActionResult> AddVoteAsync([FromBody] AddVoteRequest request)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.AddVoteAsync(request, UserId);
             });
         }
     }

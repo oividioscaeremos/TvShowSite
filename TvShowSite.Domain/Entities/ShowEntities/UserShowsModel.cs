@@ -16,6 +16,7 @@ namespace TvShowSite.Domain.Entities.ShowEntities
     public class UserShowHomeEntity
     {
         public int ShowId { get; set; }
+        public int SeasonId { get; set; }
         public int EpisodeId { get; set; }
         public string? Name { get; set; }
         public string? PosterURL { get; set; }

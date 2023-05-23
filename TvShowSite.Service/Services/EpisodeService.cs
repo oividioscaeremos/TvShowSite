@@ -52,6 +52,44 @@ namespace TvShowSite.Service.Services
                     response.Value = new MarkAsWatchedResponseEntity
                     {
                         EpisodeId = nextToWatch.EpisodeId,
+                        SeasonId = nextToWatch.SeasonId,
+                        EpisodeNumber = nextToWatch.EpisodeNumber,
+                        SeasonNumber = nextToWatch.SeasonNumber,
+                    };
+                }
+                else
+                {
+                    response.Value = new MarkAsWatchedResponseEntity
+                    {
+                        IsFinished = true
+                    };
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<MarkAsNotWatchedResponse> MarkAsNotWatchedAsync(MarkAsNotWatchedRequest request, int userId)
+        {
+            var response = new MarkAsNotWatchedResponse()
+            {
+                ErrorList = ShowValidationService.ValidateMarkAsWatchedRequest(request)
+            };
+
+            if (response.Status)
+            {
+                await _userEpisodeRepository.MarkAsDeletedByUserIdAndEpisodeIdAsync(request.EpisodeId!.Value, userId);
+
+                var userNextToWatch = await _homeService.GetUserNextToWatchAsync(userId);
+
+                if (userNextToWatch.Value?.Any(userShow => userShow.ShowId == request.ShowId!.Value) == true)
+                {
+                    var nextToWatch = userNextToWatch.Value.First(userShow => userShow.ShowId == request.ShowId!.Value);
+
+                    response.Value = new MarkAsWatchedResponseEntity
+                    {
+                        EpisodeId = nextToWatch.EpisodeId,
+                        SeasonId = nextToWatch.SeasonId,
                         EpisodeNumber = nextToWatch.EpisodeNumber,
                         SeasonNumber = nextToWatch.SeasonNumber,
                     };
@@ -87,6 +125,8 @@ namespace TvShowSite.Service.Services
                     {
                         EpisodeNumber = userShowHome.EpisodeNumber,
                         SeasonNumber = userShowHome.SeasonNumber,
+                        SeasonId = userShowHome.SeasonId,
+                        EpisodeId = userShowHome.EpisodeId
                     }).First();
                 }
             }

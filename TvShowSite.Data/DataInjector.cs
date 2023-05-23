@@ -32,6 +32,7 @@ namespace TvShowSite.Data
             container.Register<CharacterEpisodeRepository>(Lifestyle.Singleton);
             container.Register<AuthorizationRepository>(Lifestyle.Singleton);
             container.Register<CharacterRepository>(Lifestyle.Singleton);
+            container.Register<UserCharacterVoteRepository>(Lifestyle.Singleton);
         }
     }
 }

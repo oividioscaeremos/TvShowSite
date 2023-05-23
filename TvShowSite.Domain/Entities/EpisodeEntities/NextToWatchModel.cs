@@ -9,6 +9,8 @@ namespace TvShowSite.Domain.Entities.EpisodeEntities
 {
     public class ShowNextToWatchResponseEntity
     {
+        public int SeasonId { get; set; }
+        public int EpisodeId { get; set; }
         public int SeasonNumber { get; set; }
         public int EpisodeNumber { get; set; }
     }
