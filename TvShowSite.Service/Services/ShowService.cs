@@ -264,6 +264,20 @@ namespace TvShowSite.Service.Services
             return response;
         }
 
+        public async Task<UserShowStatusResponse> GetUserShowStatusAsync(int? showId, int userId)
+        {
+            var response = new UserShowStatusResponse();
+
+            if (!showId.HasValue) response.ErrorList.Add("Show identifier cannot be empty.");
+
+            if(response.Status)
+            {
+                response.Value = (await _userShowRepository.GetUserShowsByUserIdAsync(userId)).Any(s => s.ShowId == showId!.Value);
+            }
+
+            return response;
+        }
+
         private async Task<List<string>> AddShowAsync(int movieDbId, int userId)
         {
             var errorList = new List<string>();

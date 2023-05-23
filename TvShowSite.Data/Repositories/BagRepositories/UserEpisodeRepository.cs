@@ -34,7 +34,7 @@ namespace TvShowSite.Data.Repositories.BagRepositories
                 WHERE E.ShowId IN (
                     SELECT ShowId FROM site.UserShow
                     WHERE UserId = @UserId
-                    AND IsDeleted <> TRUE
+                    {(showId.HasValue ? "" : "AND IsDeleted <> TRUE")}
                 )
                 AND E.Id NOT IN (
                     SELECT UEE.EpisodeId FROM site.UserEpisode UEE

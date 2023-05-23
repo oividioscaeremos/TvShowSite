@@ -49,9 +49,12 @@ namespace TvShowSite.Data.Repositories.BagRepositories
         {
             await QueryAsync(@"
                 UPDATE site.UserShow
-                SET IsDeleted = TRUE
+                SET IsDeleted = TRUE,
+                UpdatedBy = @UserId,
+                UpdateDate = NOW()
                 WHERE UserId = @UserId
                 AND ShowId = @ShowId
+                AND IsDeleted <> TRUE
             ", new Dictionary<string, object>()
             {
                 { "UserId", userId },

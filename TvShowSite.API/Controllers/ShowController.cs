@@ -99,5 +99,15 @@ namespace TvShowSite.API.Controllers
                 return await _showService.GetShowSeasonsEpisodesAsync(showId);
             });
         }
+        
+        [HttpGet]
+        [Route("get_user_show_status")]
+        public async Task<ActionResult> GetUserShowStatusAsync(int? showId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _showService.GetUserShowStatusAsync(showId, UserId);
+            });
+        }
     }
 }

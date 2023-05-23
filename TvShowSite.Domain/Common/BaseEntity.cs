@@ -31,7 +31,7 @@ namespace TvShowSite.Domain.Common
         }
     }
 
-    public class BaseResponse<T> where T : class
+    public class BaseResponse<T>
     {
         public T? Value { get; set; }
         public List<string> ErrorList { get; set; }
