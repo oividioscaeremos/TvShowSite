@@ -9,7 +9,6 @@ namespace TvShowSite.Domain.TableEntities
         public int? ParentCommentId { get; set; }
         public string? CommentText { get; set; }
         public int ShowId { get; set; }
-        public int SeasonId { get; set; }
-        public int EpisodeId { get; set; }
+        public int? EpisodeId { get; set; }
     }
 }

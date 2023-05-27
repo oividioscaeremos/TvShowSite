@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TvShowSite.Data.Repositories;
 using TvShowSite.Data.Repositories.BagRepositories;
+using TvShowSite.Domain.Common;
 using TvShowSite.Domain.Entities.EpisodeEntities;
 using TvShowSite.Domain.TableEntities.BagEntities;
 using TvShowSite.Service.ValidationServices;
@@ -12,15 +14,18 @@ namespace TvShowSite.Service.Services
 {
     public class EpisodeService
     {
+        private readonly EpisodeRepository _episodeRepository;
         private readonly UserEpisodeRepository _userEpisodeRepository;
         private readonly UserCharacterVoteRepository _userCharacterVoteRepository;
         private readonly HomeService _homeService;
 
         public EpisodeService(
+            EpisodeRepository episodeRepository,
             UserEpisodeRepository userEpisodeRepository,
             UserCharacterVoteRepository userCharacterVoteRepository,
             HomeService homeService)
         {
+            _episodeRepository = episodeRepository;
             _userEpisodeRepository = userEpisodeRepository;
             _userCharacterVoteRepository = userCharacterVoteRepository;
             _homeService = homeService;
@@ -153,6 +158,20 @@ namespace TvShowSite.Service.Services
                 };
 
                 await _userCharacterVoteRepository.InsertAsync(newVote, userId);
+            }
+
+            return response;
+        }
+
+        public async Task<BaseResponse<string>> GetEpisodeDescriptionAsync(int? episodeId, int userId)
+        {
+            var response = new BaseResponse<string>();
+
+            if (!episodeId.HasValue) response.ErrorList.Add("Episode identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                response.Value = await _episodeRepository.GetEpisodeDescriptionAsync(episodeId!.Value);
             }
 
             return response;

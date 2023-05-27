@@ -14,6 +14,8 @@ namespace TvShowSite.Service
             container.Register<MovieDbService>(Lifestyle.Singleton);
             container.Register<HomeService>(Lifestyle.Singleton);
             container.Register<EpisodeService>(Lifestyle.Singleton);
+            container.Register<CommentService>(Lifestyle.Singleton);
+            container.Register<EmojiService>(Lifestyle.Singleton);
         }
     }
 }

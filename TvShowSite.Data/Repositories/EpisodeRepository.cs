@@ -23,5 +23,18 @@ namespace TvShowSite.Data.Repositories
                 { "MovieDbId", movieDbId }
             });
         }
+
+        public async Task<string> GetEpisodeDescriptionAsync(int episodeId)
+        {
+            return await QueryFirstOrDefaultAsync<string>(@"
+                SELECT Description FROM site.Episode
+                WHERE Id = @EpisodeId
+                AND IsDeleted <> TRUE
+                LIMIT 1
+            ", new Dictionary<string, object>()
+            {
+                { "EpisodeId", episodeId }
+            });
+        }
     }
 }
