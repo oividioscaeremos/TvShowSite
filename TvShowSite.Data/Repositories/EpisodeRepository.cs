@@ -36,5 +36,38 @@ namespace TvShowSite.Data.Repositories
                 { "EpisodeId", episodeId }
             });
         }
+
+        public async Task<string> GetEpisodeNameAsync(int episodeId)
+        {
+            return await QueryFirstOrDefaultAsync<string>(@"
+                SELECT
+                    CONCAT('Season ', S.SeasonNumber, ' Episode ', EP.EpisodeNumber, ' - ', EP.Name)
+                FROM 
+                    site.Episode EP,
+                    site.Season S
+                WHERE EP.Id = @EpisodeId
+                AND S.Id = EP.SeasonId
+                LIMIT 1
+            ", new Dictionary<string, object>()
+            {
+                { "EpisodeId", episodeId }
+            });
+        }
+
+        public async Task<bool> GetEpisodeWatchedStatusAsync(int episodeId, int userId)
+        {
+            return await QueryFirstOrDefaultAsync<bool>(@"
+                SELECT
+                    COUNT(*)
+                FROM site.UserEpisode
+                WHERE UserId = @UserId
+                AND EpisodeId = @EpisodeId
+                AND IsDeleted <> TRUE
+            ", new Dictionary<string, object>()
+            {
+                { "UserId", userId },
+                { "EpisodeId", episodeId }
+            });
+        }
     }
 }

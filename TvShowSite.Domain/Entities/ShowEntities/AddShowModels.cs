@@ -11,9 +11,10 @@ namespace TvShowSite.Domain.Entities.ShowEntities
     {
         public int? Id { get; set; }
         public int? TheMovieDbId { get; set; }
+        public bool AddToShows { get; set; }
     }
 
-    public class AddShowResponse : BaseResponse
+    public class AddShowResponse : BaseResponse<int>
     {
 
     }

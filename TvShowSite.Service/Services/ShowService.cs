@@ -136,7 +136,7 @@ namespace TvShowSite.Service.Services
                         showId = addedShow.Id;
                     }
 
-                    if (response.Status)
+                    if (response.Status && request.AddToShows)
                     {
                         var dbUserShow = await _userShowRepository.GetUserShowsByShowIdAsync(userId, showId);
 
@@ -152,6 +152,8 @@ namespace TvShowSite.Service.Services
                             await _userShowRepository.InsertAsync(dbUserShowEntity, userId);
                         }
                     }
+
+                    response.Value = showId;
                 }
             }
 
@@ -230,7 +232,7 @@ namespace TvShowSite.Service.Services
             return response;
         }
 
-        public async Task<FavoriteCharactersResponse> GetShowFavoriteCharactersAsync(int? id, int? episodeId)
+        public async Task<FavoriteCharactersResponse> GetShowFavoriteCharactersAsync(int? id, int? episodeId, int userId)
         {
             var response = new FavoriteCharactersResponse()
             {
@@ -241,7 +243,7 @@ namespace TvShowSite.Service.Services
 
             if (response.Status)
             {
-                response.Value = (await _characterEpisodeRepository.GetCharactersByShowIdAndEpisodeIdAsync(id!.Value, episodeId)).ToList();
+                response.Value = (await _characterEpisodeRepository.GetCharactersByShowIdAndEpisodeIdAsync(id!.Value, episodeId, userId)).ToList();
             }
 
             return response;

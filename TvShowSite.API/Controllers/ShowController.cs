@@ -86,7 +86,7 @@ namespace TvShowSite.API.Controllers
         {
             return await ExecuteAsync(async () =>
             {
-                return await _showService.GetShowFavoriteCharactersAsync(showId, episodeId);
+                return await _showService.GetShowFavoriteCharactersAsync(showId, episodeId, UserId);
             });
         }
 

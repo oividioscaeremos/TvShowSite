@@ -33,6 +33,7 @@ namespace TvShowSite.Data.Repositories
 					WHERE C.ParentCommentId IS NULL
 					AND C.ShowId = @ShowId {(episodeId.HasValue ? "AND C.EpisodeId = @EpisodeId" : "")}
 					AND C.InsertedBy = UT.Id
+					AND C.IsDeleted <> TRUE
 				) X
 				ORDER BY X.IsUsersComment DESC, X.Id DESC
 				OFFSET @Offset
@@ -67,6 +68,7 @@ namespace TvShowSite.Data.Repositories
 						site.UserTable UT
 					WHERE C.ParentCommentId = @ParentCommentId
 					AND C.InsertedBy = UT.Id
+					AND C.IsDeleted <> TRUE
 				) X
 				ORDER BY X.IsUsersComment ASC, X.CommentDate ASC
 			", new Dictionary<string, object>()

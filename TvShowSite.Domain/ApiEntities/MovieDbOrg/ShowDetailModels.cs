@@ -45,7 +45,7 @@ namespace TvShowSite.Domain.ApiEntities.MovieDbOrg
     {
         public int? Id { get; set; }
         [JsonProperty("air_date")]
-        public DateTime AirDate { get; set; }
+        public DateTime? AirDate { get; set; }
         [JsonProperty("episode_count")]
         public int EpisodeCount { get; set; }
         public string? Name { get; set; }

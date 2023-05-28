@@ -59,5 +59,15 @@ namespace TvShowSite.API.Controllers
                 return await _emojiService.AddReactionAsync(request, UserId);
             });
         }
+        
+        [HttpPost]
+        [Route("remove_reaction")]
+        public async Task<IActionResult> RemoveReactionAsync([FromBody] RemoveReactionRequest request)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _emojiService.RemoveReactionAsync(request, UserId);
+            });
+        }
     }
 }

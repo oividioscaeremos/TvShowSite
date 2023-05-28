@@ -36,7 +36,7 @@ namespace TvShowSite.Service.Services
             {
                 var emojis = await _emojiRepository.GetEmojisAsync(isComment.Value);
 
-                response.Value = emojis.Select(emoji => new GetEmojisResponseEntity { Id = emoji.Id, EmojiClass = emoji.EmojiClassName }).ToList();
+                response.Value = emojis.Select(emoji => new GetEmojisResponseEntity { Id = emoji.Id, EmojiClass = emoji.EmojiClassName, EmojiName = emoji.Name }).ToList();
             }
             else
             {
@@ -112,6 +112,28 @@ namespace TvShowSite.Service.Services
                     await _episodeEmojiRepository.MarkEpisodeRelatedReactionsAsDeletedByUserIdAsync(request.EpisodeId!.Value, userId);
                     
                     await _episodeEmojiRepository.InsertAsync(episodeEmoji, userId);
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<RemoveReactionResponse> RemoveReactionAsync(RemoveReactionRequest request, int userId)
+        {
+            var response = new RemoveReactionResponse()
+            {
+                ErrorList = EmojiValidationService.ValidateAddReactionRequest(request)
+            };
+
+            if (response.Status)
+            {
+                if (request.CommentId.HasValue)
+                {
+                    await _commentEmojiRepository.MarkCommentRelatedReactionsAsDeletedByUserIdAsync(request.CommentId!.Value, userId);
+                }
+                else
+                {
+                    await _episodeEmojiRepository.MarkEpisodeRelatedReactionsAsDeletedByUserIdAsync(request.EpisodeId!.Value, userId);
                 }
             }
 

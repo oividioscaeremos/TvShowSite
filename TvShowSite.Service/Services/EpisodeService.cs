@@ -16,17 +16,20 @@ namespace TvShowSite.Service.Services
     {
         private readonly EpisodeRepository _episodeRepository;
         private readonly UserEpisodeRepository _userEpisodeRepository;
+        private readonly UserEpisodeNoteRepository _userEpisodeNoteRepository;
         private readonly UserCharacterVoteRepository _userCharacterVoteRepository;
         private readonly HomeService _homeService;
 
         public EpisodeService(
             EpisodeRepository episodeRepository,
             UserEpisodeRepository userEpisodeRepository,
+            UserEpisodeNoteRepository userEpisodeNoteRepository,
             UserCharacterVoteRepository userCharacterVoteRepository,
             HomeService homeService)
         {
             _episodeRepository = episodeRepository;
             _userEpisodeRepository = userEpisodeRepository;
+            _userEpisodeNoteRepository = userEpisodeNoteRepository;
             _userCharacterVoteRepository = userCharacterVoteRepository;
             _homeService = homeService;
         }
@@ -148,11 +151,11 @@ namespace TvShowSite.Service.Services
 
             if (response.Status)
             {
-                await _userCharacterVoteRepository.MarkOtherVotesAsDeletedForEpisodeAndCharacterByIdAsync(userId, request.EpisodeId!.Value, request.CharacterId!.Value);
+                await _userCharacterVoteRepository.MarkVotesAsDeletedByUserIdAndEpisodeIdAsync(userId, request.EpisodeId!.Value);
 
                 var newVote = new UserCharacterVote
                 {
-                    CharacterId = request.CharacterId.Value,
+                    CharacterId = request.CharacterId!.Value,
                     EpisodeId = request.EpisodeId.Value,
                     UserId = userId
                 };
@@ -163,7 +166,22 @@ namespace TvShowSite.Service.Services
             return response;
         }
 
-        public async Task<BaseResponse<string>> GetEpisodeDescriptionAsync(int? episodeId, int userId)
+        public async Task<RemoveVoteResponse> RemoveVoteAsync(RemoveVoteRequest request, int userId)
+        {
+            var response = new RemoveVoteResponse()
+            {
+                ErrorList = EpisodeValidationService.ValidateRemoveVoteRequest(request)
+            };
+
+            if (response.Status)
+            {
+                await _userCharacterVoteRepository.MarkVotesAsDeletedByUserIdAndEpisodeIdAsync(userId, request.EpisodeId!.Value);
+            }
+
+            return response;
+        }
+
+        public async Task<BaseResponse<string>> GetEpisodeDescriptionAsync(int? episodeId)
         {
             var response = new BaseResponse<string>();
 
@@ -172,6 +190,120 @@ namespace TvShowSite.Service.Services
             if (response.Status)
             {
                 response.Value = await _episodeRepository.GetEpisodeDescriptionAsync(episodeId!.Value);
+            }
+
+            return response;
+        }
+
+        public async Task<BaseResponse<string>> GetEpisodeNameAsync(int? episodeId)
+        {
+            var response = new BaseResponse<string>();
+
+            if (!episodeId.HasValue) response.ErrorList.Add("Episode identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                response.Value = await _episodeRepository.GetEpisodeNameAsync(episodeId!.Value);
+            }
+
+            return response;
+        }
+
+        public async Task<BaseResponse<bool>> GetEpisodeWatchedStatusAsync(int? episodeId, int userId)
+        {
+            var response = new BaseResponse<bool>();
+
+            if (!episodeId.HasValue) response.ErrorList.Add("Episode identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                response.Value = await _episodeRepository.GetEpisodeWatchedStatusAsync(episodeId!.Value, userId);
+            }
+
+            return response;
+        }
+
+        public async Task<AddEpisodeNoteResponse> AddEpisodeNoteAsync(AddEpisodeNoteRequest request, int userId)
+        {
+            var response = new AddEpisodeNoteResponse()
+            {
+                ErrorList = EpisodeValidationService.ValidateAddEpisodeNoteRequest(request)
+            };
+
+            if (response.Status)
+            {
+                var userEpisodeNote = new UserEpisodeNote()
+                {
+                    UserId = userId,
+                    EpisodeId = request.EpisodeId!.Value,
+                    Content = request.Content
+                };
+
+                await _userEpisodeNoteRepository.InsertAsync(userEpisodeNote, userId);
+
+                response.Value = new AddEpisodeNoteResponseEntity()
+                {
+                    Id = userId,
+                    UserId = userId,
+                    EpisodeId = request.EpisodeId!.Value,
+                    Content = request.Content
+                };
+            }
+
+            return response;
+        }
+
+        public async Task<GetEpisodeNotesResponse> GetEpisodeNotesAsync(int? episodeId, int userId)
+        {
+            var response = new GetEpisodeNotesResponse();
+
+            if (!episodeId.HasValue) response.ErrorList.Add("Episode identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                var episodeNote = await _userEpisodeNoteRepository.GetAllNotesByEpisodeIdAsync(episodeId!.Value, userId);
+
+                if (episodeNote?.Any() == true)
+                {
+                    response.Value = episodeNote.Select(entity => new GetEpisodeNotesResponseEntity
+                    {
+                        Id = entity.Id,
+                        Content = entity.Content,
+                        EpisodeId = entity.EpisodeId,
+                        UserId = entity.UserId
+                    }).ToList();
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<UpdateEpisodeNoteResponse> UpdateEpisodeNoteAsync(UpdateEpisodeNoteRequest request, int userId)
+        {
+            var response = new UpdateEpisodeNoteResponse()
+            {
+                ErrorList = EpisodeValidationService.ValidateUpdateEpisodeNoteRequest(request)
+            };
+
+            if (response.Status)
+            {
+                await _userEpisodeNoteRepository.UpdateNoteContentByIdAsync(request.NoteId!.Value, request.NewContent!, userId);
+            }
+
+            return response;
+        }
+
+        public async Task<DeleteEpisodeNoteResponse> DeleteEpisodeNoteAsync(int? noteId, int userId)
+        {
+            var response = new DeleteEpisodeNoteResponse();
+
+            if (!noteId.HasValue) response.ErrorList.Add("Note identifier cannot be empty.");
+
+            if (response.Status)
+            {
+                var note = await _userEpisodeNoteRepository.GetByIdAsync(noteId!.Value);
+
+                await _userEpisodeNoteRepository.MarkAsDeletedAsync(note, userId);
             }
 
             return response;

@@ -17,22 +17,20 @@ namespace TvShowSite.Data.Repositories.BagRepositories
 
         }
 
-        public async Task MarkOtherVotesAsDeletedForEpisodeAndCharacterByIdAsync(int userId, int episodeId, int characterId)
+        public async Task MarkVotesAsDeletedByUserIdAndEpisodeIdAsync(int userId, int episodeId)
         {
             await QueryAsync(@"
-                UPDATE site.UserCharacterVoteRepository
+                UPDATE site.UserCharacterVote
                 SET IsDeleted = TRUE,
                 UpdateDate = NOW(),
                 UpdatedBy = @UserId
                 WHERE UserId = @UserId
                 AND EpisodeId = @EpisodeId
-                AND CharacterId = @CharacterId
                 AND IsDeleted <> TRUE
             ", new Dictionary<string, object>()
             {
                 { "UserId", userId },
-                { "EpisodeId", episodeId },
-                { "CharacterId", characterId }
+                { "EpisodeId", episodeId }
             });
         }
     }

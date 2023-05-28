@@ -33,6 +33,7 @@ namespace TvShowSite.Data
             container.Register<AuthorizationRepository>(Lifestyle.Singleton);
             container.Register<CharacterRepository>(Lifestyle.Singleton);
             container.Register<UserCharacterVoteRepository>(Lifestyle.Singleton);
+            container.Register<UserEpisodeNoteRepository>(Lifestyle.Singleton);
         }
     }
 }

@@ -51,13 +51,93 @@ namespace TvShowSite.API.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("add_vote")]
         public async Task<IActionResult> AddVoteAsync([FromBody] AddVoteRequest request)
         {
             return await ExecuteAsync(async () =>
             {
                 return await _episodeService.AddVoteAsync(request, UserId);
+            });
+        }
+
+        [HttpPost]
+        [Route("remove_vote")]
+        public async Task<IActionResult> RemoveVoteAsync([FromBody] RemoveVoteRequest request)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.RemoveVoteAsync(request, UserId);
+            });
+        }
+
+        [HttpGet]
+        [Route("get_episode_description")]
+        public async Task<IActionResult> GetEpisodeDescriptionAsync(int? episodeId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.GetEpisodeDescriptionAsync(episodeId);
+            });
+        }
+        
+        [HttpGet]
+        [Route("get_episode_name")]
+        public async Task<IActionResult> GetEpisodeNameAsync(int? episodeId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.GetEpisodeNameAsync(episodeId);
+            });
+        }
+        
+        [HttpGet]
+        [Route("get_episode_watched_status")]
+        public async Task<IActionResult> GetEpisodeWatchedStatusAsync(int? episodeId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.GetEpisodeWatchedStatusAsync(episodeId, UserId);
+            });
+        }
+        
+        [HttpPost]
+        [Route("add_episode_note")]
+        public async Task<IActionResult> AddEpisodeNoteAsync([FromBody] AddEpisodeNoteRequest request)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.AddEpisodeNoteAsync(request, UserId);
+            });
+        }
+        
+        [HttpGet]
+        [Route("get_episode_notes")]
+        public async Task<IActionResult> GetEpisodeNotedAsync(int? episodeId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.GetEpisodeNotesAsync(episodeId, UserId);
+            });
+        }
+        
+        [HttpPost]
+        [Route("update_episode_note")]
+        public async Task<IActionResult> UpdateEpisodeNoteAsync([FromBody] UpdateEpisodeNoteRequest request)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.UpdateEpisodeNoteAsync(request, UserId);
+            });
+        }
+
+        [HttpDelete]
+        [Route("delete_episode_note")]
+        public async Task<IActionResult> DeleteEpisodeNoteAsync(int? noteId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _episodeService.DeleteEpisodeNoteAsync(noteId, UserId);
             });
         }
     }
