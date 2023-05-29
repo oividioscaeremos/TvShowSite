@@ -75,7 +75,7 @@ namespace TvShowSite.Service.Services
 
                     response.Value = showsFromAPI.Results.Select(result => new ShowSearchResponseEntity
                     {
-                        Id = showIdMovieDbIds?.FirstOrDefault(model => model.MovieDbId == result.Id!.ToString())?.Id,
+                        Id = showIdMovieDbIds?.FirstOrDefault(model => model.MovieDbId == result.Id!)?.Id,
                         MovieDbId = result.Id,
                         ShowName = result.Name,
                         PosterURL = SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.ImageBaseUrl + result.PosterPath,
@@ -122,7 +122,7 @@ namespace TvShowSite.Service.Services
                 else if(request.TheMovieDbId.HasValue)
                 {
                     int showId;
-                    var show = await _showRepository.GetShowByMovieDbOrgIdAsync(request.TheMovieDbId.Value.ToString());
+                    var show = await _showRepository.GetShowByMovieDbOrgIdAsync(request.TheMovieDbId.Value);
 
                     if(show is not null)
                     {
@@ -132,8 +132,11 @@ namespace TvShowSite.Service.Services
                     {
                         response.ErrorList = await this.AddShowAsync(request.TheMovieDbId.Value, userId);
 
-                        var addedShow = await _showRepository.GetShowByMovieDbOrgIdAsync(request.TheMovieDbId.Value.ToString());
+                        var addedShow = await _showRepository.GetShowByMovieDbOrgIdAsync(request.TheMovieDbId.Value);
+
                         showId = addedShow.Id;
+
+                        await this.HandleMultipleCharactersAsync(showId);
                     }
 
                     if (response.Status && request.AddToShows)
@@ -284,7 +287,7 @@ namespace TvShowSite.Service.Services
         {
             var errorList = new List<string>();
 
-            var dbShow = await _showRepository.GetShowByMovieDbOrgIdAsync(movieDbId.ToString());
+            var dbShow = await _showRepository.GetShowByMovieDbOrgIdAsync(movieDbId);
 
             var showDetails = await _movieDbService.GetShowDetailsAsync(movieDbId);
 
@@ -303,7 +306,7 @@ namespace TvShowSite.Service.Services
                         IsOngoing = showDetails.IsOnGoing ?? true,
                         EpisodeRunTime = showDetails.EpisodeRuntime != null ? showDetails.EpisodeRuntime[0] : -1,
                         Popularity = Convert.ToInt32(showDetails.Popularity),
-                        MovieDbId = showDetails.Id.ToString(),
+                        MovieDbId = showDetails.Id,
                     };
 
                     if (showDetails.OriginCountries?.Any() == true)
@@ -377,10 +380,10 @@ namespace TvShowSite.Service.Services
 
                     if (showDetails.Seasons?.Any() == true)
                     {
-                        for (int i = 1; i < showDetails.Seasons.Count; i++)
+                        await Parallel.ForEachAsync(showDetails.Seasons, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (season, cancellationToken) =>
                         {
-                            await this.AddSeasonAsync(int.Parse(show.MovieDbId), show.Id, showDetails.Seasons[i].SeasonNumber, userId, errorList);
-                        }
+                            await this.AddSeasonAsync(show.MovieDbId.Value, show.Id, season.SeasonNumber, userId, errorList);
+                        });
                     }
                 }
                 else
@@ -394,10 +397,10 @@ namespace TvShowSite.Service.Services
                 {
                     if (showDetails.Seasons?.Any() == true)
                     {
-                        for (int i = 1; i < showDetails.Seasons.Count; i++)
+                        await Parallel.ForEachAsync(showDetails.Seasons, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (season, cancellationToken) =>
                         {
-                            await this.AddSeasonAsync(int.Parse(dbShow.MovieDbId!), dbShow.Id, showDetails.Seasons[i].SeasonNumber, userId, errorList);
-                        }
+                            await this.AddSeasonAsync(dbShow.MovieDbId!.Value, dbShow.Id, season.SeasonNumber, userId, errorList);
+                        });
                     }
                 }
                 else
@@ -416,7 +419,7 @@ namespace TvShowSite.Service.Services
             {
                 int dbSeasonId;
 
-                var dbSeason = await _seasonRepository.GetByMovieDbIdAsync(seasonDetailsFromApi.Id.ToString());
+                var dbSeason = await _seasonRepository.GetByMovieDbIdAsync(seasonDetailsFromApi.Id);
 
                 if(dbSeason is not null)
                 {
@@ -426,7 +429,7 @@ namespace TvShowSite.Service.Services
                 {
                     var dbSeasonToInsert = new Season
                     {
-                        MovieDbId = seasonDetailsFromApi.Id.ToString(),
+                        MovieDbId = seasonDetailsFromApi.Id,
                         SeasonNumber = seasonNumber,
                         ShowId = showId,
                         Name = seasonDetailsFromApi.Name,
@@ -442,10 +445,10 @@ namespace TvShowSite.Service.Services
 
                 if(seasonDetailsFromApi.Episodes?.Any() == true)
                 {
-                    for(int i = 0; i < seasonDetailsFromApi.Episodes.Count; i++)
+                    await Parallel.ForEachAsync(seasonDetailsFromApi.Episodes, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (episode, cancellationToken) =>
                     {
-                        await this.AddEpisodeAsync(showMovieDbId, showId, dbSeasonId, seasonNumber, seasonDetailsFromApi.Episodes[i].EpisodeNumber, userId, errorList);
-                    }
+                        await this.AddEpisodeAsync(showMovieDbId, showId, dbSeasonId, seasonNumber, episode.EpisodeNumber, userId, errorList);
+                    });
                 }
             }
         }
@@ -457,7 +460,7 @@ namespace TvShowSite.Service.Services
             if(episodeDetailsFromApi is not null)
             {
                 int dbEpisodeId;
-                var dbEpisode = await _episodeRepository.GetByMovieDbIdAsync(episodeDetailsFromApi.Id.ToString());
+                var dbEpisode = await _episodeRepository.GetByMovieDbIdAsync(episodeDetailsFromApi.Id);
 
                 if(dbEpisode is not null)
                 {
@@ -467,7 +470,7 @@ namespace TvShowSite.Service.Services
                 {
                     var dbEpisodeToInsert = new Episode
                     {
-                        MoviedbId = episodeDetailsFromApi.Id.ToString(),
+                        MoviedbId = episodeDetailsFromApi.Id,
                         ShowId = showId,
                         SeasonId = seasonId,
                         EpisodeNumber = episodeNumber,
@@ -491,19 +494,19 @@ namespace TvShowSite.Service.Services
                         episodeCreditDetails.Cast = episodeCreditDetails.Cast.Concat(episodeCreditDetails.GuestStars).ToList();
                     }
 
-                    foreach(var cast in episodeCreditDetails.Cast)
+                    await Parallel.ForEachAsync(episodeCreditDetails.Cast, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (cast, cancellationToken) =>
                     {
                         int characterId;
 
                         var systemCharacter = await _characterRepository.GetCharacterFromMovideDbIdAsync(cast.Id);
 
-                        if(systemCharacter is null)
+                        if (systemCharacter is null)
                         {
                             var dbCharacterToInsert = new Character
                             {
                                 CharacterName = cast.CharacterName,
                                 CharacterOrder = cast.Order,
-                                MovieDbId = cast.Id.ToString(),
+                                MovieDbId = cast.Id,
                                 PosterURL = cast.PosterURL,
                                 Role = cast.Department,
                                 ShowId = showId
@@ -520,7 +523,7 @@ namespace TvShowSite.Service.Services
 
                         var dbCharacterEpisode = await _characterEpisodeRepository.GetByCharacterIdSeasonIdEpisodeIdAsync(characterId, seasonId, dbEpisodeId);
 
-                        if(dbCharacterEpisode is null)
+                        if (dbCharacterEpisode is null)
                         {
                             var characterEpisodeEntity = new CharacterEpisode
                             {
@@ -532,6 +535,32 @@ namespace TvShowSite.Service.Services
 
                             await _characterEpisodeRepository.InsertAsync(characterEpisodeEntity, userId);
                         }
+                    });
+                }
+            }
+        }
+
+        private async Task HandleMultipleCharactersAsync(int showId)
+        {
+            var showCharacters = await _characterRepository.GetCharactersByShowIdAsync(showId);
+
+            if (showCharacters?.Any() == true)
+            {
+                var groupedCharacters = showCharacters.GroupBy(character => character.MovieDbId).Where(g => g.Count() > 1);
+
+                foreach (var characterGroup in groupedCharacters)
+                {
+                    var characterToRetain = characterGroup.First();
+
+                    var deleteCharacters = characterGroup.Where(c => c.Id != characterToRetain.Id);
+
+                    foreach (var character in deleteCharacters)
+                    {
+                        await _characterEpisodeRepository.UpdateCharacterIdByCharacterIdAsync(character.Id, characterToRetain.Id);
+
+                        await _characterEpisodeRepository.HardDeleteByCharacterIdAsync(character.Id);
+
+                        await _characterRepository.HardDeleteCharacterByIdAsync(character.Id);
                     }
                 }
             }
