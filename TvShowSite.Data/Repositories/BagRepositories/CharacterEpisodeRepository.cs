@@ -76,5 +76,29 @@ namespace TvShowSite.Data.Repositories.BagRepositories
                 { "UserId", userId }
             });
         }
+
+        public async Task UpdateCharacterIdByCharacterIdAsync(int oldCharacterId, int newCharacterId)
+        {
+            await QueryAsync(@"
+                UPDATE site.CharacterEpisode
+                SET CharacterId = @NewCharacterId
+                WHERE CharacterId = @OldCharacterId
+            ", new Dictionary<string, object>()
+            {
+                { "OldCharacterId", oldCharacterId },
+                { "NewCharacterId", newCharacterId }
+            });
+        }
+
+        public async Task HardDeleteByCharacterIdAsync(int characterId)
+        {
+            await QueryAsync(@"
+                DELETE FROM site.CharacterEpisode
+                WHERE CharacterId = @CharacterId
+            ", new Dictionary<string, object>()
+            {
+                { "CharacterId", characterId }
+            });
+        }
     }
 }

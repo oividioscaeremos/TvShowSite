@@ -28,6 +28,27 @@ namespace TvShowSite.Data.Repositories
                 { "MovieDbId", movieDbId }
             });
         }
+
+        public async Task<IEnumerable<Character>> GetCharactersByShowIdAsync(int showId)
+        {
+            return await QueryAsync(@"
+                SELECT * FROM site.Character
+                WHERE ShowId = @ShowId
+                AND IsDeleted <> TRUE
+            ", new Dictionary<string, object>()
+            {
+                { "ShowId", showId }
+            });
+        }
+
+        public async Task HardDeleteCharacterByIdAsync(int characterId)
+        {
+            await QueryAsync(@"
+                DELETE FROM site.Character
+                WHERE Id = @Id
+            ", new Dictionary<string, object>()
+            {
+                { "Id", characterId }
             });
         }
     }

@@ -92,13 +92,13 @@ namespace TvShowSite.Data.Repositories
             return await QueryAsync<SeasonEpisodeResponseEntity>(@"
                 SELECT
                     SH.Id as ShowId,
-                    SE.Id as SeasonId,
-                    EP.Id as EpisodeId,
+                    MAX(SE.Id) as SeasonId,
+                    MAX(EP.Id) as EpisodeId,
                     MAX(SE.Name) as SeasonName,
                     MAX(EP.EpisodeNumber) as EpisodeNumber,
                     MAX(EP.Name) as EpisodeName,
                     CASE 
-                        WHEN (SELECT UE.EpisodeId FROM site.UserEpisode UE WHERE UE.EpisodeId = EP.Id AND UE.IsDeleted <> TRUE LIMIT 1) IS NULL THEN FALSE
+                        WHEN (SELECT UE.EpisodeId FROM site.UserEpisode UE WHERE UE.EpisodeId = MAX(EP.Id)) IS NULL THEN FALSE
                         ELSE TRUE
                     END as IsWatched
                 FROM
@@ -109,8 +109,9 @@ namespace TvShowSite.Data.Repositories
                     SH.Id = SE.ShowId
                     AND SE.Id = EP.SeasonId
                     AND SH.Id = @ShowId
-                GROUP BY SH.Id, SE.Id, EP.Id
-                ORDER BY SH.Id, SE.Id, EP.Id ASC
+                    AND SE.SeasonNumber > 0
+                GROUP BY SH.Id, SE.SeasonNumber, EP.EpisodeNumber
+                ORDER BY SH.Id, SE.SeasonNumber, EP.EpisodeNumber ASC
             ", new Dictionary<string, object>()
             {
                 { "ShowId", showId }

@@ -16,33 +16,36 @@ namespace TvShowSite.Data.Repositories.BagRepositories
         public async Task<IEnumerable<UserShowHomeEntity>> GetUserNextToWatchAsync(int userId, int? showId = null)
         {
             return await QueryAsync<UserShowHomeEntity>($@"
-                SELECT 
-                    E.ShowId,
-                    MIN(E.Id) as EpisodeId,
-                    (SELECT SeasonNumber FROM site.Season WHERE Id = MIN(S.Id)),
-                    MIN(S.Id) as SeasonId,
-                    (SELECT EpisodeNumber FROM site.Episode WHERE Id = MIN(E.Id)),
-                    (SELECT CONCAT(@PosterBase, PosterURL) as PosterURL FROM site.Show WHERE Id = MIN(E.ShowId)),
-                    (SELECT Name FROM site.Show WHERE Id = MIN(E.ShowId))
-                FROM
-                    site.Episode E
-                    LEFT OUTER JOIN site.UserEpisode UE
-                    ON UE.EpisodeId = E.Id
-                    AND UE.IsDeleted <> TRUE
-                    JOIN site.Season S
-                    ON E.SeasonId = S.Id
-                WHERE E.ShowId IN (
-                    SELECT ShowId FROM site.UserShow
-                    WHERE UserId = @UserId
-                    {(showId.HasValue ? "" : "AND IsDeleted <> TRUE")}
-                )
-                AND E.Id NOT IN (
-                    SELECT UEE.EpisodeId FROM site.UserEpisode UEE
-                    WHERE UEE.UserId = @UserId
-                    AND IsDeleted <> TRUE
-                )
-                {(showId.HasValue ? "AND E.ShowId = @ShowId" : "")}
-                GROUP BY E.ShowId
+                SELECT * FROM (
+                    SELECT 
+                        ROW_NUMBER() OVER(PARTITION BY SH.Id ORDER BY CONCAT(to_char(SE.SeasonNumber, '000'), to_char(EP.EpisodeNumber, '000')) ASC) as ROWNUM, 
+                        SH.Id as ShowId,
+                        EP.Id as EpisodeId,
+                        SE.Id as SeasonId,
+                        CONCAT(@PosterBase, SH.PosterURL) as PosterURL,
+                        SH.Name,
+                        SE.SeasonNumber, 
+                        EP.EpisodeNumber
+                    FROM 
+                        site.Season SE,
+                        site.Episode EP,
+                        site.Show SH
+                    WHERE SH.Id = EP.ShowId 
+                    AND EP.SeasonId = SE.Id
+                    AND EP.ShowId IN (
+                        SELECT ShowId FROM site.UserShow
+                        WHERE UserId = @UserId
+                        {(showId.HasValue ? "" : "AND IsDeleted <> TRUE")}
+                    )
+                    AND SE.SeasonNumber > 0
+                    AND EP.Id NOT IN (
+                        SELECT UEE.EpisodeId FROM site.UserEpisode UEE
+                        WHERE UEE.UserId = @UserId
+                        AND IsDeleted <> TRUE
+                    )
+                    {(showId.HasValue ? "AND EP.ShowId = @ShowId" : "")}
+                ) X
+                WHERE X.ROWNUM = 1
             ", new Dictionary<string, object>()
             {
                 { "UserId", userId },
