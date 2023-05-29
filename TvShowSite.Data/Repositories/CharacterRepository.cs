@@ -25,7 +25,9 @@ namespace TvShowSite.Data.Repositories
                 LIMIT 1
             ", new Dictionary<string, object>()
             {
-                { "MovieDbId", movieDbId.ToString() }
+                { "MovieDbId", movieDbId }
+            });
+        }
             });
         }
     }

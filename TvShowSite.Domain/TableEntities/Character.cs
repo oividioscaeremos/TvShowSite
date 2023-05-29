@@ -11,7 +11,7 @@ namespace TvShowSite.Domain.TableEntities
     [TableName("Character")]
     public class Character : BaseEntity
     {
-        public string? MovieDbId { get; set; }
+        public int? MovieDbId { get; set; }
         public int ShowId { get; set; }
         public string? CharacterName { get; set; }
         public string? Role { get; set; }

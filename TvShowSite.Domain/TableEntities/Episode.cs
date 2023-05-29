@@ -6,7 +6,7 @@ namespace TvShowSite.Domain.TableEntities
     [TableName("Episode")]
     public sealed class Episode : BaseEntity
     {
-        public string? MoviedbId { get; set; }
+        public int? MoviedbId { get; set; }
         public int ShowId { get; set; }
         public int SeasonId { get; set; }
         public int EpisodeNumber { get; set; }

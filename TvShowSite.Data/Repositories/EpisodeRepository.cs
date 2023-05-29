@@ -11,7 +11,7 @@ namespace TvShowSite.Data.Repositories
 
         }
 
-        public async Task<Episode> GetByMovieDbIdAsync(string movieDbId)
+        public async Task<Episode> GetByMovieDbIdAsync(int movieDbId)
         {
             return await QueryFirstOrDefaultAsync(@"
                 SELECT * FROM site.Episode

@@ -34,14 +34,14 @@ namespace TvShowSite.Data.Repositories
             });
         }
 
-        public async Task<Show> GetShowByMovieDbOrgIdAsync(string movieDbId)
+        public async Task<Show> GetShowByMovieDbOrgIdAsync(int movieDbId)
         {
             return await QueryFirstOrDefaultAsync(@"
                 SELECT * FROM site.Show
                 WHERE MovieDbId = @MovieDbId
             ", new Dictionary<string, object>()
             {
-                { "MovieDbId", movieDbId.ToString() }
+                { "MovieDbId", movieDbId }
             });
         }
 
