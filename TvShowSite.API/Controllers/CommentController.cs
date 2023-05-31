@@ -58,5 +58,15 @@ namespace TvShowSite.API.Controllers
                 return await _commentService.GetChildCommentsAsync(request, UserId);
             });
         }
+        
+        [HttpGet]
+        [Route("get_latest_comments")]
+        public async Task<ActionResult> GetLatestCommentsAsync(int? userId)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                return await _commentService.GetLatestCommentsAsync(userId ?? UserId);
+            });
+        }
     }
 }

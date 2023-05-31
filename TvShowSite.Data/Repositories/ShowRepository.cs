@@ -98,7 +98,7 @@ namespace TvShowSite.Data.Repositories
                     MAX(EP.EpisodeNumber) as EpisodeNumber,
                     MAX(EP.Name) as EpisodeName,
                     CASE 
-                        WHEN (SELECT UE.EpisodeId FROM site.UserEpisode UE WHERE UE.EpisodeId = MAX(EP.Id)) IS NULL THEN FALSE
+                        WHEN (SELECT UE.EpisodeId FROM site.UserEpisode UE WHERE UE.EpisodeId = MAX(EP.Id) LIMIT 1) IS NULL THEN FALSE
                         ELSE TRUE
                     END as IsWatched
                 FROM

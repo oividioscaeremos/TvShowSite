@@ -77,5 +77,38 @@ namespace TvShowSite.Data.Repositories
 				{ "UserId", userId },
             });
         }
+
+		public async Task<IEnumerable<GetLatestCommentsResponseEntity>> GetLatestCommentsAsync(int userId)
+		{
+			return await QueryAsync<GetLatestCommentsResponseEntity>(@"
+				SELECT
+					S.Id as ShowId,
+					EP.Id as EpisodeId,
+					S.Name as ShowName,
+					SE.SeasonNumber,
+					EP.EpisodeNumber,
+					C.CommentText,
+					C.InsertDate as CommentDate,
+					UT.Username
+				FROM
+					site.Comment C
+					INNER JOIN site.Show S
+					ON S.Id = C.ShowId
+					LEFT OUTER JOIN site.Episode EP
+					ON EP.ShowId = S.Id
+					AND EP.Id = C.EpisodeId
+					LEFT OUTER JOIN site.Season SE
+					ON SE.Id = EP.SeasonId
+					INNER JOIN site.UserTable UT
+					ON UT.Id = C.InsertedBy
+				WHERE
+					C.InsertedBy = @UserId
+				ORDER BY C.Id DESC
+				LIMIT 10
+			", new Dictionary<string, object>()
+			{
+				{ "UserId", userId }
+			});
+		}
     }
 }

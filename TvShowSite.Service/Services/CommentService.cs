@@ -108,5 +108,19 @@ namespace TvShowSite.Service.Services
 
             return response;
         }
+
+        public async Task<GetLatestCommentsResponse> GetLatestCommentsAsync(int userId)
+        {
+            var response = new GetLatestCommentsResponse();
+
+            var comments = await _commentRepository.GetLatestCommentsAsync(userId);
+
+            if (comments?.Any() == true)
+            {
+                response.Value = comments.ToList();
+            }
+
+            return response;
+        }
     }
 }
