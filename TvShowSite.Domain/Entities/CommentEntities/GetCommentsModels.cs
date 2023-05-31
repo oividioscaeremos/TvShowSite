@@ -28,6 +28,9 @@ namespace TvShowSite.Domain.Entities.CommentEntities
 
     public class GetCommentsResponse : BaseResponse<List<GetCommentsResponseEntity>>
     {
-
+        public GetCommentsResponse()
+        {
+            this.Value = new List<GetCommentsResponseEntity>();
+        }
     }
 }

@@ -25,4 +25,8 @@
     <ProjectReference Include="..\TvShowSite.Service\TvShowSite.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\pictures\" />
+  </ItemGroup>
+
 </Project>

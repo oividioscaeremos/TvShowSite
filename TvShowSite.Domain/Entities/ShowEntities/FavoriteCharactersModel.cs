@@ -18,6 +18,9 @@ namespace TvShowSite.Domain.Entities.ShowEntities
 
     public class FavoriteCharactersResponse : BaseResponse<List<FavoriteCharactersResponsEntity>>
     {
-
+        public FavoriteCharactersResponse()
+        {
+            this.Value = new List<FavoriteCharactersResponsEntity>();
+        }
     }
 }

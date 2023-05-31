@@ -11,6 +11,7 @@
     {
         public int AccessTokenLifetimeInMinutes { get; set; }
         public int RefreshTokenLifetimeInMinutes { get; set; }
+        public string? ApiUrl { get; set; }
     }
 
     public class ConnectionStrings

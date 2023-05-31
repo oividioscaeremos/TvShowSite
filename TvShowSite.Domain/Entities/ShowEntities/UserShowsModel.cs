@@ -9,8 +9,10 @@ namespace TvShowSite.Domain.Entities.ShowEntities
 {
     public class GetUserNextToWatchResponse : BaseResponse<List<UserShowHomeEntity>>
     {
-
-
+        public GetUserNextToWatchResponse()
+        {
+            this.Value = new List<UserShowHomeEntity>();
+        }
     }
 
     public class UserShowHomeEntity

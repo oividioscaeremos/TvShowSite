@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,6 +183,124 @@ namespace TvShowSite.Service.Services
             await _userTableRepository.MarkAsDeletedByUserIdAsync(userId);
 
             return "Success";
+        }
+
+        public async Task<UploadFileResponse> UploadFileAsync(IFormFile file)
+        {
+            var response = new UploadFileResponse();
+
+            if (file is not null && file.Length > 0)
+            {
+                var fileNameWithExtension = Path.GetFileName(file.FileName);
+
+                var fileExtension = fileNameWithExtension.Substring(fileNameWithExtension.LastIndexOf('.') + 1);
+
+                if (new List<string> { "png", "jpg", "jpeg" }.Contains(fileExtension.ToLower()))
+                {
+                    var fullFileName = Guid.NewGuid().ToString() + "." + fileExtension;
+
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\pictures", fullFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+
+                    response.Value =  (SettingsHelper.Settings?.AppSettings?.ApiUrl ?? "") + "/pictures/" + fullFileName;
+                }
+                else
+                {
+                    response.ErrorList.Add("Poster türü PNG, JPG ve JPEG uzantılı olmalıdır.");
+                }
+            }
+            else
+            {
+                response.ErrorList.Add("Could not detect any file to upload.");
+            }
+
+            return response;
+        }
+
+        public async Task<ChangeUserPictureResponse> ChangeUserPictureAsync(ChangeUserPictureRequest request, int userId)
+        {
+            var response = new ChangeUserPictureResponse()
+            {
+                ErrorList = AccountValidationService.ValidateChangeUserPictureRequest(request)
+            };
+
+            if (response.Status)
+            {
+                if (request.IsProfilePicture == true)
+                {
+                    await _userTableRepository.UpdateUserProfilePictureAsync(request.PictureUrl!, userId);
+                }
+                else
+                {
+                    await _userTableRepository.UpdateUserCoverPictureAsync(request.PictureUrl!, userId);
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<ChangeMailAddressResponse> ChangeMailAddressAsync(ChangeMailAddressRequest request, int userId)
+        {
+            var response = new ChangeMailAddressResponse()
+            {
+                ErrorList = AccountValidationService.ValidateChangeMailAddressRequest(request)
+            };
+
+            if (response.Status)
+            {
+                await _userTableRepository.UpdateUserMailAddressAsync(request.EmailAddress!, userId);
+            }
+
+            return response;
+        }
+
+        public async Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request, int userId)
+        {
+            var response = new ChangePasswordResponse()
+            {
+                ErrorList = AccountValidationService.ValidateChangePasswordRequest(request)
+            };
+
+            if (response.Status)
+            {
+                var encodedPassword = SecurityHelper.GetMD5Hash(request.Password!);
+
+                await _userTableRepository.UpdateUserPasswordAsync(encodedPassword, userId);
+            }
+
+            return response;
+        }
+
+        public async Task<GetUserProfileDetailResponse> GetUserProfileDetailAsync(GetUserProfileDetailRequest request, int userId)
+        {
+            var response = new GetUserProfileDetailResponse()
+            {
+                Value = new GetUserProfileDetailResponseEntity()
+            };
+
+            response.Value.IsUsersOwnProfile = request.UserId.HasValue ? request.UserId == userId : true;
+
+            int requestUserId = request.UserId ?? userId;
+
+            var user = await _userTableRepository.GetByIdAsync(requestUserId);
+
+            if (user is not null)
+            {
+                response.Value.ProfilePictureUrl = user.ProfilePictureURL;
+                response.Value.CoverPictureUrl = user.CoverPictureURL;
+                response.Value.MailAddress = response.Value.IsUsersOwnProfile ? user.EmailAddress : string.Empty;
+                response.Value.Username = user.Username;
+            }
+            else
+            {
+                response.ErrorList.Add("User could not be found.");
+            }
+
+            return response;
         }
 
         private static (string? accessToken, string? refreshToken) CreateAccessTokenAndRefreshToken(int userId, string username, DateTime expiresAt)

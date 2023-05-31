@@ -15,6 +15,9 @@ namespace TvShowSite.Domain.Entities.ShowEntities
 
     public class SeasonEpisodeResponse : BaseResponse<List<SeasonEpisodeResponseEntity>>
     {
-         
+        public SeasonEpisodeResponse()
+        {
+            this.Value = new List<SeasonEpisodeResponseEntity>();
+        }
     }
 }

@@ -16,6 +16,9 @@ namespace TvShowSite.Domain.Entities.EmojiEntities
 
     public class GetEmojisResponse : BaseResponse<List<GetEmojisResponseEntity>>
     {
-
+        public GetEmojisResponse()
+        {
+            this.Value = new List<GetEmojisResponseEntity>();
+        }
     }
 }

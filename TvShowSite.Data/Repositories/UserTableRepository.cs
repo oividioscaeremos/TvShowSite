@@ -65,5 +65,57 @@ namespace TvShowSite.Data.Repositories
                 { "UserId", userId }
             });
         }
+
+        public async Task UpdateUserProfilePictureAsync(string pictureUrl, int userId)
+        {
+            await QueryAsync(@"
+                UPDATE site.UserTable
+                SET ProfilePictureURL = @ProfilePictureURL
+                WHERE Id = @Id
+            ", new Dictionary<string, object>()
+            {
+                { "ProfilePictureURL", pictureUrl },
+                { "UserId", userId }
+            });
+        }
+
+        public async Task UpdateUserCoverPictureAsync(string pictureUrl, int userId)
+        {
+            await QueryAsync(@"
+                UPDATE site.UserTable
+                SET CoverPictureURL = @CoverPictureURL
+                WHERE Id = @Id
+            ", new Dictionary<string, object>()
+            {
+                { "CoverPictureURL", pictureUrl },
+                { "UserId", userId }
+            });
+        }
+
+        public async Task UpdateUserMailAddressAsync(string mailAddress, int userId)
+        {
+            await QueryAsync(@"
+                UPDATE site.UserTable
+                SET EmailAddress = @EmailAddress
+                WHERE Id = @Id
+            ", new Dictionary<string, object>()
+            {
+                { "EmailAddress", mailAddress },
+                { "UserId", userId }
+            });
+        }
+        
+        public async Task UpdateUserPasswordAsync(string password, int userId)
+        {
+            await QueryAsync(@"
+                UPDATE site.UserTable
+                SET Password = @Password
+                WHERE Id = @Id
+            ", new Dictionary<string, object>()
+            {
+                { "Password", password },
+                { "UserId", userId }
+            });
+        }
     }
 }

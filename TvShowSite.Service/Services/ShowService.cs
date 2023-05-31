@@ -28,6 +28,7 @@ namespace TvShowSite.Service.Services
         private readonly SeasonRepository _seasonRepository;
         private readonly ShowRepository _showRepository;
         private readonly UserEpisodeRepository _userEpisodeRepository;
+        private readonly UserEpisodeNoteRepository _userEpisodeNoteRepository;
         private readonly UserShowRepository _userShowRepository;
         private readonly MovieDbService _movieDbService;
 
@@ -41,6 +42,7 @@ namespace TvShowSite.Service.Services
             SeasonRepository seasonRepository,
             ShowRepository showRepository,
             UserEpisodeRepository userEpisodeRepository,
+            UserEpisodeNoteRepository userEpisodeNoteRepository,
             UserShowRepository userShowRepository,
             MovieDbService movieDbService)
         {
@@ -53,6 +55,7 @@ namespace TvShowSite.Service.Services
             _seasonRepository = seasonRepository;
             _showRepository = showRepository;
             _userEpisodeRepository = userEpisodeRepository;
+            _userEpisodeNoteRepository = userEpisodeNoteRepository;
             _userShowRepository = userShowRepository;
             _movieDbService = movieDbService;
         }
@@ -278,6 +281,47 @@ namespace TvShowSite.Service.Services
             if(response.Status)
             {
                 response.Value = (await _userShowRepository.GetUserShowsByUserIdAsync(userId)).Any(s => s.ShowId == showId!.Value);
+            }
+
+            return response;
+        }
+
+        public async Task<GetShowNotesResponse> GetShowNotesAsync(int? showId, int userId)
+        {
+            var response = new GetShowNotesResponse();
+
+            var showNotes = await _userEpisodeNoteRepository.GetShowNotesAsync(showId, userId);
+
+            if(showNotes?.Any() == true)
+            {
+                response.Value = showNotes
+                    .GroupBy(entity => entity.ShowId)
+                    .Select(entity => new GetShowNotesShowEntity
+                    {
+                        ShowId = entity.Key,
+                        ShowName = entity.First().ShowName,
+                        Notes = entity.Select(details => new GetShowNotesNoteEntity
+                        {
+                            EpisodeId = details.EpisodeId,
+                            NoteContent = details.NoteContent,
+                            SeasonNumber = details.SeasonNumber,
+                            EpisodeNumber = details.EpisodeNumber
+                        }).ToList()
+                    }).ToList();
+            }
+
+            return response;
+        }
+
+        public async Task<GetUserShowResponse> GetUserShowsAsync(int? userId, int loggedInUserId)
+        {
+            var response = new GetUserShowResponse();
+
+            var userShows = await _userShowRepository.GetUserProfileShowsByUserIdAsync(userId ?? loggedInUserId);
+
+            if (userShows?.Any() == true)
+            {
+                response.Value = userShows.ToList();
             }
 
             return response;

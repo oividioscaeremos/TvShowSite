@@ -1,6 +1,8 @@
-﻿using TvShowSite.Data.Common;
+﻿using TvShowSite.Core.Helpers;
+using TvShowSite.Data.Common;
 using TvShowSite.Data.Common.Connections;
 using TvShowSite.Domain.Entities.ShowEntities;
+using TvShowSite.Domain.System;
 using TvShowSite.Domain.TableEntities.BagEntities;
 
 namespace TvShowSite.Data.Repositories.BagRepositories
@@ -71,6 +73,27 @@ namespace TvShowSite.Data.Repositories.BagRepositories
             ", new Dictionary<string, object>()
             {
                 { "UserId", userId }
+            });
+        }
+
+        public async Task<IEnumerable<GetUserShowResponseEntity>> GetUserProfileShowsByUserIdAsync(int userId)
+        {
+            return await QueryAsync<GetUserShowResponseEntity>(@"
+                SELECT
+                    S.Id as ShowId,
+                    S.Name as ShowName,
+                    CONCAT(@PosterBase, S.PosterUrl) as PosterUrl
+                FROM
+                    site.UserShow US,
+                    site.Show S
+                WHERE
+                    S.Id = US.ShowId
+                    AND US.UserId = @UserId
+                    AND US.IsDeleted <> TRUE
+            ", new Dictionary<string, object>()
+            {
+                { "UserId", userId },
+                { "PosterBase", SettingsHelper.Settings?.ApiDetails?.TheMovieDbOrg?.ImageBaseUrl ?? string.Empty }
             });
         }
     }

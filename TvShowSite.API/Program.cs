@@ -119,6 +119,8 @@ app.Services.UseSimpleInjector(container);
 app.UsePathBase("/api");
 
 app.UseAuthentication();
+app.UseStaticFiles();
+
 app.UseRouting();
 app.UseCors("AllowLocalhost");
 app.UseAuthorization();
